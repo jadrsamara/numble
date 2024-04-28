@@ -1,0 +1,22 @@
+<form action="{% url 'play:login_user_view' %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend>
+            <h1>Log in</h1>
+        </legend>
+
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+        <label for="username"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="username" id="username" required>
+
+        <br><br>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+
+        <br><br>
+
+    </fieldset>
+    <input type="submit" value="Log in">
+</form>
