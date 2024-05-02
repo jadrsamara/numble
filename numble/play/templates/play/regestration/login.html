@@ -1,4 +1,10 @@
-<form action="{% url 'play:login_user_view' %}" method="post">
+{% extends "../base.html" %} 
+{% block content %} 
+
+
+
+
+<form action="{% url 'play:login_done_view' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" method="post">
     {% csrf_token %}
     <fieldset>
         <legend>
@@ -12,11 +18,16 @@
 
         <br><br>
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
+        <label for="password"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" id="password" name="password" required>
 
         <br><br>
 
     </fieldset>
     <input type="submit" value="Log in">
 </form>
+
+
+
+
+{% endblock %}

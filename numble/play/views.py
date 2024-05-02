@@ -4,6 +4,9 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
+
 
 import hashlib
 
@@ -11,23 +14,23 @@ base_template = "play/index.html"
 base_reverse = "play:index"
 
 
+# --- Home ---
+
+
 def index(request):
-
-    is_logged_in = False
-    if request.user.is_authenticated:
-        is_logged_in = True
-
     return render(
         request,
         base_template,
-        {
-            "is_logged_in": is_logged_in,
-        }
     )
 
 
+# --- User Views ---
+
+
 def signup_view(request):
-    template_name = "play/signup.html"
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse(base_reverse))
+    template_name = "play/regestration/signup.html"
     return render(
         request,
         template_name,
@@ -35,7 +38,9 @@ def signup_view(request):
 
 
 @require_http_methods(["POST"])
-def user(request):
+def signup_done_view(request):
+
+    sign_up_template = 'play/regestration/signup.html'
 
     def validate(request):
         email = User.objects.filter(email=request.POST["email"])
@@ -44,7 +49,7 @@ def user(request):
         if len(list(email)) > 0:
             return render(
                 request,
-                "play/signup.html",
+                sign_up_template,
                 {
                     "error_message": "Email is already registered!",
                 },
@@ -53,7 +58,7 @@ def user(request):
         if len(list(username)) > 0:
             return render(
                 request,
-                "play/signup.html",
+                sign_up_template,
                 {
                     "error_message": "Username is already registered!",
                 },
@@ -72,14 +77,13 @@ def user(request):
         last_name=request.POST["lastname"],
     )
 
-    # user = authenticate(username=request.POST["username"], password=hashlib.sha256(request.POST["password"].encode('utf-8')).hexdigest())
     if user is not None:
         login(request, user)
         return HttpResponseRedirect(reverse(base_reverse))
     else:
         return render(
                 request,
-                "play/signup.html",
+                sign_up_template,
                 {
                     "error_message": "Unexpected Error!",
                 },
@@ -87,7 +91,12 @@ def user(request):
 
 
 def login_view(request):
-    template_name = "play/login.html"
+    next_page = request.GET.get('next') if request.GET.get('next') is not None else reverse(base_reverse)
+
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(next_page)
+    
+    template_name = "play/regestration/login.html"
     return render(
         request,
         template_name,
@@ -95,7 +104,8 @@ def login_view(request):
 
 
 @require_http_methods(["POST"])
-def login_user_view(request):
+def login_done_view(request):
+    next_page = request.GET.get('next') if request.GET.get('next') is not None else reverse(base_reverse)
     
     username = request.POST["username"]
     password = hashlib.sha256(request.POST["password"].encode('utf-8')).hexdigest()
@@ -108,16 +118,13 @@ def login_user_view(request):
     elif user_email is not None:
         login(request, user_email)
     else:
-        template_name = "play/login.html"
+        template_name = "play/regestration/login.html"
         return render(
             request,
             template_name,
-            {
-                "error_message": "Please enter the correct username and password"
-            },
         )
 
-    return HttpResponseRedirect(reverse(base_reverse))
+    return HttpResponseRedirect(next_page)
 
 
 def logout_view(request):
@@ -126,14 +133,32 @@ def logout_view(request):
     return HttpResponseRedirect(reverse(base_reverse))
 
 
+# --- App Views ---
+
+
+@login_required(login_url='/login/')
 def play_view(request):
 
     template_name = "play/play.html"
-    
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse(base_reverse))
 
     return render(
         request,
         template_name,
     )
+
+
+@login_required(login_url='/login/')
+def game_view(request):
+    """
+    Creates a new game if user has no current games
+    Redirects to the new / unfinished game
+    """
+    game_id = 15
+
+    return HttpResponseRedirect(f'/game/{game_id}')
+
+
+@login_required(login_url='/login/')
+def game_by_id_view(request, game_id):
+    print(game_id)
+    raise NotImplementedError

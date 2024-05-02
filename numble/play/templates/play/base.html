@@ -1,0 +1,40 @@
+{% load static %}
+<link rel="shortcut icon" type="image/svg" href="{% static 'play/images/favicon.svg' %}">
+<link rel="stylesheet" href="{% static 'play/css/style.css' %}">
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<!-- Others -->
+<title>Numble</title>
+
+<html lang="en">
+
+<head>
+</head>
+
+<body>
+    <header>
+        <div class="header">
+            <a href="{% url 'play:index' %}" class="logo">Numble <span lang="ar">نمبل</span></a>
+            <div class="header-right">
+                <a class="active" href="{% url 'play:index' %}">Home</a>
+                {% if user.is_authenticated %}
+                <a href="#leaderboard">Leaderboard</a>
+                <a href="#account">Account</a>
+                <a href="{% url 'play:logout_view' %}">Log out</a>
+                {% else %}
+                <a href="#leaderboard">Leaderboard</a>
+                <a href="{% url 'play:signup_view' %}">Sign up</a>
+                <a href="{% url 'play:login_view' %}">Log in</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    {% block content %}
+    {% endblock %}
+    <footer>
+    </footer>
+</body>
+
+</html>

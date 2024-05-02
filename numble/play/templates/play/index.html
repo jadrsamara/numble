@@ -1,13 +1,19 @@
-<h1>Numble</h1>
+{% extends "./base.html" %} 
+{% block content %} 
 
-{% if is_logged_in %}
+
+{% if user.is_authenticated %}
 <a href="{% url 'play:play_view' %}">
     <h2>Play Now!</h2>
 </a>
-<a href="{% url 'play:logout_view' %}">Log out</a>
 {% else %}
-<h2>Sign in to Play Now!</h2>
+<h2>Sign up / Log in to Play Now!</h2>
 <a href="{% url 'play:signup_view' %}">Sign up</a>
 <br>
 <a href="{% url 'play:login_view' %}">Log in</a>
 {% endif %}
+
+
+
+
+{% endblock %}
