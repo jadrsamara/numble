@@ -2,7 +2,15 @@
 {% block content %} 
 
 
-<h2>Coming Soon...</h2>
+<h1>Select Game Mode:</h1>
+
+<a href="{% url 'play:game_view' 'easy' %}">easy</a>
+<br>
+<a href="{% url 'play:game_view' 'medium' %}">medium</a>
+<br>
+<a href="{% url 'play:game_view' 'hard' %}">hard</a>
+<br>
+<a href="{% url 'play:game_view' 'daily' %}">daily</a>
 
 
 {% endblock %}

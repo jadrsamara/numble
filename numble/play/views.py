@@ -1,14 +1,17 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-
-
+from django.utils import timezone
 
 import hashlib
+import random
+
+from .models import Game
+
 
 base_template = "play/index.html"
 base_reverse = "play:index"
@@ -147,18 +150,67 @@ def play_view(request):
     )
 
 
+def get_a_new_game_number(game_mode):
+    number_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+    if game_mode == 'easy':
+        game_number = random.sample(number_pool, 4)
+        return ''.join(str(num) for num in game_number)
+    if game_mode == 'medium':
+        game_number = random.sample(number_pool, 5)
+        return ''.join(str(num) for num in game_number)
+    if game_mode == 'hard':
+        game_number = random.sample(number_pool, 6)
+        return ''.join(str(num) for num in game_number)
+    if game_mode == 'easy':
+        raise NotImplementedError()
+    
+
+def update_game(game, number_of_tries, tries):
+    game.number_of_tries = number_of_tries,
+    game.tries = tries,
+    game.save()
+
+
+def complete_game(game, number_of_tries, tries):
+    now = timezone.now()
+    game.number_of_tries = number_of_tries,
+    game.tries = tries,
+    game.finish_time = now,
+    game.duration = now - game.start_time,
+    game.game_completed = True,
+    game.save()
+
+
 @login_required(login_url='/login/')
-def game_view(request):
+def game_view(request, game_mode):
     """
     Creates a new game if user has no current games
     Redirects to the new / unfinished game
     """
-    game_id = 15
 
-    return HttpResponseRedirect(f'/game/{game_id}')
+    if game_mode not in ['easy', 'medium', 'hard', 'daily']:
+        return HttpResponseNotFound()
+
+    game = Game.objects.filter(user=request.user, game_completed=False, game_mode=game_mode).first()
+    if game == None:
+        game = Game.objects.create_game(
+            user = request.user,
+            game_mode = game_mode, 
+            number = get_a_new_game_number(game_mode)
+        )
+
+    game_id = game.pk
+
+    return HttpResponseRedirect(f'/game/{game_mode}/{game_id}')
 
 
 @login_required(login_url='/login/')
-def game_by_id_view(request, game_id):
+def game_by_id_view(request, game_mode, game_id):
     print(game_id)
-    raise NotImplementedError
+
+    game = Game.objects.filter(pk=game_id, user=request.user).first()
+    
+    if game == None:
+        return HttpResponseNotFound()
+    
+    return HttpResponse(game.user)
