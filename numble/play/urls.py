@@ -42,6 +42,6 @@ urlpatterns = [
 
     path("game/<slug:game_mode>/", views.game_view, name="game_view"),
     path("game/<slug:game_mode>/<int:game_id>/", views.game_by_id_view, name="game_by_id_view"),
-    # path("game/<int:game_id>/submit/", views.play_view, name="play_view"),
+    path("game/<slug:game_mode>/<int:game_id>/submit/", views.game_submit_view, name="game_submit_view"),
 ]
 

@@ -1,0 +1,24 @@
+{% extends "./base.html" %}
+{% block content %}
+{% load custom_template_tags %}
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+{% for i in game_tries_range %}
+{% for j in game_mode_range %}
+<input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1" value="{% get_value game_tries i j %}" disabled>
+{% endfor %}
+<br>
+{% endfor %}
+<form action=" {% url 'play:game_submit_view' game_mode=game_mode game_id=game_id %} " method="post">
+    {% csrf_token %}
+    {% for i in game_mode_range %}
+    <input type="number" id="input_cell{{i}}" name="input_cell{{i}}" maxlength="1" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" required>
+    {% endfor %}
+    <input type="submit" value="Submit">
+</form>
+
+
+
+
+{% endblock %}

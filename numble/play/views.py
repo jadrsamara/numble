@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponseServerError
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
@@ -15,6 +15,8 @@ from .models import Game
 
 base_template = "play/index.html"
 base_reverse = "play:index"
+
+
 
 
 # --- Home ---
@@ -206,11 +208,69 @@ def game_view(request, game_mode):
 
 @login_required(login_url='/login/')
 def game_by_id_view(request, game_mode, game_id):
-    print(game_id)
 
-    game = Game.objects.filter(pk=game_id, user=request.user).first()
+    game = Game.objects.filter(pk=game_id, user=request.user, game_mode=game_mode).first()
     
     if game == None:
         return HttpResponseNotFound()
     
-    return HttpResponse(game.user)
+    tries = []
+    for i in range(1, 10):
+        game_try = game.tries.get(f"try{i}")
+        if game_try is None:
+            break
+        tries.append(game_try)
+
+    template_name = "play/game.html"
+
+    return render(
+        request,
+        template_name,
+        {
+            "game_tries": tries,
+            "game_tries_range": range(len(tries)),
+            "game_mode_range": range(len(get_a_new_game_number(game_mode))),
+            "game_mode": game_mode,
+            "game_id": game_id,
+        },
+    )
+
+
+@login_required(login_url='/login/')
+@require_http_methods(["POST"])
+def game_submit_view(request, game_mode, game_id):
+
+    game = Game.objects.filter(pk=game_id, user=request.user, game_mode=game_mode).first()
+    
+    if game == None:
+        return HttpResponseNotFound()
+    
+    number_of_tries = game.number_of_tries
+    if number_of_tries >= 10:
+        raise NotImplementedError() 
+
+    new_number_try = []
+
+    for i in range(len(get_a_new_game_number(game_mode))):
+        cell = request.POST[f"input_cell{i}"]
+        if not 2 > len(cell) > 0:
+            return HttpResponseServerError()
+        new_number_try.append(cell)
+    
+    new_number_try = ''.join(str(x) for x in new_number_try)
+
+    number_of_tries += 1
+    game.number_of_tries = number_of_tries
+
+    tries = game.tries
+
+    tries[f"try{number_of_tries}"] = new_number_try
+    game.tries = tries
+
+    if number_of_tries == 10:
+        # end game
+        raise NotImplementedError()
+    
+    game.save()
+
+    return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
