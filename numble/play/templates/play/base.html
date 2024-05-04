@@ -5,6 +5,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+
 <!-- Others -->
 <title>Numble</title>
 
@@ -16,9 +18,9 @@
 <body>
     <header>
         <div class="header">
-            <a href="{% url 'play:index' %}" class="logo">Numble <span lang="ar">نمبل</span></a>
+            <div class="logo"><a href="{% url 'play:index' %}">Numble نمبل</a></div>
             <div class="header-right">
-                <a class="active" href="{% url 'play:index' %}">Home</a>
+                <a class="active" href="{% url 'play:index' %}">Numble نمبل</a>
                 {% if user.is_authenticated %}
                 <a href="#leaderboard">Leaderboard</a>
                 <a href="#account">Account</a>

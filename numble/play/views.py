@@ -9,6 +9,7 @@ from django.utils import timezone
 
 import hashlib
 import random
+import datetime
 
 from .models import Game
 
@@ -203,7 +204,7 @@ def game_view(request, game_mode):
 
     game_id = game.pk
 
-    return HttpResponseRedirect(f'/game/{game_mode}/{game_id}')
+    return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
 
 
 @login_required(login_url='/login/')
@@ -215,7 +216,7 @@ def game_by_id_view(request, game_mode, game_id):
         return HttpResponseNotFound()
     
     tries = []
-    for i in range(1, 10):
+    for i in range(1, 10 + 1):
         game_try = game.tries.get(f"try{i}")
         if game_try is None:
             break
@@ -230,8 +231,7 @@ def game_by_id_view(request, game_mode, game_id):
             "game_tries": tries,
             "game_tries_range": range(len(tries)),
             "game_mode_range": range(len(get_a_new_game_number(game_mode))),
-            "game_mode": game_mode,
-            "game_id": game_id,
+            "game": game
         },
     )
 
@@ -245,9 +245,8 @@ def game_submit_view(request, game_mode, game_id):
     if game == None:
         return HttpResponseNotFound()
     
-    number_of_tries = game.number_of_tries
-    if number_of_tries >= 10:
-        raise NotImplementedError() 
+    if game.game_completed:
+        return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
 
     new_number_try = []
 
@@ -259,6 +258,7 @@ def game_submit_view(request, game_mode, game_id):
     
     new_number_try = ''.join(str(x) for x in new_number_try)
 
+    number_of_tries = game.number_of_tries
     number_of_tries += 1
     game.number_of_tries = number_of_tries
 
@@ -267,9 +267,22 @@ def game_submit_view(request, game_mode, game_id):
     tries[f"try{number_of_tries}"] = new_number_try
     game.tries = tries
 
-    if number_of_tries == 10:
-        # end game
-        raise NotImplementedError()
+    if number_of_tries >= 10 or game.number == new_number_try:
+        game.game_completed = True
+        game.finish_time = timezone.now()
+
+        start_time = datetime.datetime.combine(date=game.date, time=game.start_time, tzinfo=datetime.timezone.utc)
+
+        print(type(start_time))
+        print(type(game.finish_time))
+
+        print(start_time)
+        print(game.finish_time)
+
+        game.duration = datetime.datetime.now(datetime.timezone.utc) - start_time
+
+        if game.number == new_number_try:
+            game.game_won = True
     
     game.save()
 

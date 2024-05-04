@@ -1,24 +1,47 @@
 {% extends "./base.html" %}
 {% block content %}
 {% load custom_template_tags %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'play/css/game.css' %}">
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
+<div class="container">
 {% for i in game_tries_range %}
+<div class="numbers-row">
 {% for j in game_mode_range %}
-<input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1" value="{% get_value game_tries i j %}" disabled>
+    <input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1" value="{% get_value_2d game_tries i j %}" class="btn {% get_color game i j %} row-item" disabled>
 {% endfor %}
-<br>
+</div>
 {% endfor %}
-<form action=" {% url 'play:game_submit_view' game_mode=game_mode game_id=game_id %} " method="post">
+{% if not game.game_completed %}
+<form action=" {% url 'play:game_submit_view' game_mode=game.game_mode game_id=game.pk %} " method="post">
     {% csrf_token %}
+    <div class="numbers-row">
     {% for i in game_mode_range %}
-    <input type="number" id="input_cell{{i}}" name="input_cell{{i}}" maxlength="1" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" required>
+    <input type="number" id="input_cell{{i}}" name="input_cell{{i}}" maxlength="1" class="btn white  row-item" autofocus onfocus="this.select()" oninput="javascript: if (this.value.length >= this.maxLength) {this.value = this.value.slice(0, this.maxLength); this.nextElementSibling.focus();}" required>
     {% endfor %}
-    <input type="submit" value="Submit">
+    </div>
+    <br>
+    <div class="numbers-row"><input type="submit" class="btn blue submit" value="Submit"></div>
 </form>
-
-
-
+{% endif %}
+{% if game.game_completed %}
+<p><h2>Game Finished! You {% if game.game_won %}Won :){% else %}Lose :({% endif %}</h2></p>
+{% if not game.game_won %}
+<p><strong>Correct number:</strong></p>
+<div class="numbers-row">
+{% for i in game_mode_range %}
+<input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1" class="btn yellow row-item" value="{% get_value_1d game.number i %}" disabled>
+{% endfor %}
+</div>
+{% endif %}
+<p><strong>Game Stats:</strong></p>
+    <li>Number of tries: {{game.number_of_tries}}</li>
+    <li>Duration: {{ game.duration|convert_to_readable_time}}</li>
+    <li>Game Status: <strong>{% if game.game_won %}Won{% else %}Lose{% endif %}</strong></li>
+  </ul>
+{% endif %}
+</div>
 
 {% endblock %}

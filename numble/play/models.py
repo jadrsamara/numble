@@ -39,5 +39,6 @@ class Game(models.Model):
     game_completed = models.BooleanField(default=False)
     number = models.CharField(max_length=10)
     tries = models.JSONField(default=dict)
+    game_won = models.BooleanField(default=False)
 
     objects = GameManager()
