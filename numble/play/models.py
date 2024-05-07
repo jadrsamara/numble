@@ -12,6 +12,8 @@ class GameManager(models.Manager):
             number = number,
             date = timezone.now().date(),
             start_time = timezone.now(),
+            expire_time = timezone.now() + timezone.timedelta(minutes=5),
+            expire_date = (timezone.now() + timezone.timedelta(minutes=5)).date(),
         )
         return game
 
@@ -25,6 +27,8 @@ class Game(models.Model):
     start_time = models.TimeField()
     finish_time = models.TimeField(null=True)
     duration = models.DurationField(null=True)
+    expire_time = models.TimeField()
+    expire_date = models.DateField()
     number_of_tries = models.IntegerField(default=0)
     game_mode = models.CharField( 
         max_length = 6,

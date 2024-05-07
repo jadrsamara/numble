@@ -206,7 +206,11 @@ def game_view(request, game_mode):
     
     user = get_user_from_request(request)
 
-    game = Game.objects.filter(user=user, game_completed=False, game_mode=game_mode).first()
+    if not request.user.is_anonymous:
+        game = Game.objects.filter(user=user, game_completed=False, game_mode=game_mode).first()
+    else: 
+        game = None
+
     if game == None:
         game = Game.objects.create_game(
             user = user,
@@ -215,6 +219,23 @@ def game_view(request, game_mode):
         )
 
     game_id = game.pk
+
+    if type(game.expire_time) == datetime.datetime:
+        expire_time = game.expire_time.time()
+    else:
+        expire_time = game.expire_time
+
+    expire_time = datetime.datetime.combine(date=game.expire_date, time=expire_time, tzinfo=datetime.timezone.utc)
+    if expire_time < timezone.now():
+        game.game_completed = True
+        game.finish_time = timezone.now()
+        game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.start_time, tzinfo=datetime.timezone.utc)
+        game.game_won = False
+    
+        game.save()
+
+        # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+
 
     return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
 
@@ -231,6 +252,15 @@ def game_by_id_view(request, game_mode, game_id):
     
     if game == None:
         return HttpResponseNotFound()
+    
+    expire_time = datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc)
+    if datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc) < timezone.now():
+        game.game_completed = True
+        game.finish_time = timezone.now()
+        game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.expire_time, tzinfo=datetime.timezone.utc)
+        game.game_won = False
+    
+        game.save()
     
     tries = []
     for i in range(1, GAME_TRIES_LIMIT + 1):
@@ -268,6 +298,17 @@ def game_submit_view(request, game_mode, game_id):
     
     if game.game_completed:
         return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+    
+    expire_time = datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc)
+    if datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc) < timezone.now():
+        game.game_completed = True
+        game.finish_time = timezone.now()
+        game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.expire_time, tzinfo=datetime.timezone.utc)
+        game.game_won = False
+    
+        game.save()
+
+        return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
 
     new_number_try = []
 
@@ -288,17 +329,11 @@ def game_submit_view(request, game_mode, game_id):
     tries[f"try{number_of_tries}"] = new_number_try
     game.tries = tries
 
-    if number_of_tries >= 10 or game.number == new_number_try:
+    if number_of_tries >= GAME_TRIES_LIMIT or game.number == new_number_try:
         game.game_completed = True
         game.finish_time = timezone.now()
 
         start_time = datetime.datetime.combine(date=game.date, time=game.start_time, tzinfo=datetime.timezone.utc)
-
-        print(type(start_time))
-        print(type(game.finish_time))
-
-        print(start_time)
-        print(game.finish_time)
 
         game.duration = datetime.datetime.now(datetime.timezone.utc) - start_time
 
