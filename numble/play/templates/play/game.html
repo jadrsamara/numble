@@ -7,6 +7,23 @@
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 <div class="container">
+
+{% if game.user.username == 'Tutorial' %}
+<h2>How to play</h2>
+<h4>Guess the Numble in {{ GAME_TRIES_LIMIT }} tries.</h4>
+<p>Each guess must be a valid {{ game_mode_len }}-digit number.</p>
+<p>The color of the tiles will change to show how close your guess was to the number.</p>
+<ul>
+    <li><span style="color: gray; font-weight: bold;">Gray</span>: the digit is not in the number in any spot.</li>
+    <li><span style="color: #e67e22; font-weight: bold;">Orange</span>: the digit is in the number but in the wrong spot.</li>
+    <li><span style="color: #2ecc71; font-weight: bold;">Green</span>: the digit is in the number and in the correct spot.</li>
+</ul>
+<br>
+{% else %}
+<h2>Guess the {{ game_mode_len }}-digit number!</h2>
+
+{% endif %}
+
 {% for i in game_tries_range %}
 <div class="numbers-row">
 {% for j in game_mode_range %}
@@ -19,7 +36,7 @@
     {% csrf_token %}
     <div class="numbers-row">
     {% for i in game_mode_range %}
-    <input type="number" id="input_cell{{i}}" name="input_cell{{i}}" maxlength="1" class="btn white  row-item" autofocus onfocus="this.select()" oninput="javascript: if (this.value.length >= this.maxLength) {this.value = this.value.slice(0, this.maxLength); this.nextElementSibling.focus();}" required>
+    <input type="number" id="input_cell{{i}}" name="input_cell{{i}}" maxlength="1" class="btn white  row-item" autofocus onfocus="this.select(); this.click();" oninput="javascript: if (this.value.length >= this.maxLength) {this.value = this.value.slice(0, this.maxLength); this.nextElementSibling.focus();}" required>
     {% endfor %}
     </div>
     <br>
@@ -27,7 +44,13 @@
 </form>
 {% endif %}
 {% if game.game_completed %}
-<p><h2>Game Finished! You {% if game.game_won %}Won :){% else %}Lose :({% endif %}</h2></p>
+
+{% if game.game_completed and game.user == request.user %}
+<p><h2>Game {% if game.game_won %}Won :){% else %}Lose :({% endif %}</h2></p>
+{% endif %}{% if game.game_completed and game.user != request.user %}
+<p><h2>{% if game.user.username != 'Anonymous' %}{{ game.user.username }}{% else %}Game{% endif %}{% if game.game_won %} Won{% else %} Lose{% endif %}</h2></p>
+{% endif %}
+
 {% if not game.game_won %}
 <p><strong>Correct number:</strong></p>
 <div class="numbers-row">
@@ -41,6 +64,14 @@
     <li>Duration: {{ game.duration|convert_to_readable_time}}</li>
     <li>Game Status: <strong>{% if game.game_won %}Won{% else %}Lose{% endif %}</strong></li>
   </ul>
+
+  <br>
+{% if game.user.username == 'Tutorial' %}
+<strong><a href="{% url 'play:game_view' game.game_mode %}">Start a new game</a></strong>
+{% else %}
+<strong><a href="{% url 'play:game_view' game.game_mode %}">Play again?</a></strong>
+{% endif %}
+
 {% endif %}
 </div>
 

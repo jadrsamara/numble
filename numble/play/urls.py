@@ -13,11 +13,11 @@ urlpatterns = [
 
     # --- User paths ---
 
-    # path("user/", views.user, name="user"),
-    # path("user/<int:user_id>/", views.user_profile, name="user_profile"),
+    # path("user/", views.user, name="user"), 
+    # path("user/<slug:game_mode>/", views.user_profile, name="user_profile"),
 
-    # path("user/<int:user_id>/update", views.play_view, name="play_view"),
-    # path("user/<int:user_id>/update/done/", views.play_view, name="play_view"),
+    # path("user/<slug:game_mode>/update", views.play_view, name="play_view"),
+    # path("user/<slug:game_mode>/update/done/", views.play_view, name="play_view"),
 
     path("signup/", views.signup_view, name="signup_view"),
     path("signup/done/", views.signup_done_view, name="signup_done_view"),

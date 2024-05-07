@@ -67,7 +67,32 @@
   display: block;
 }
 
+.index-logo {
+  width: 17vw;
+}
+
+.wrapper {
+  width: 80%;
+  position: relative;
+}
+
+.wrapped {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  margin-top: 2%;
+  text-align: center;
+}
+
+li {
+  text-align: left;
+}
+
 @media only screen and (max-width: 600px) {
+
+  .index-logo {
+    width: 40vw;
+  }
 
   .active {
     visibility: visible;
