@@ -9,8 +9,9 @@ from django.utils import timezone
 
 import os
 import hashlib
-import random
+import random as random
 import datetime
+import random as random_with_seed
 
 from .models import Game
 
@@ -156,6 +157,13 @@ def play_view(request):
     )
 
 
+def generate_numbers_by_seed(seed, number_of_digits):
+    random_with_seed.seed(seed)
+    numbers = list(range(10))
+    random_with_seed.shuffle(numbers)
+    return numbers[:number_of_digits]
+
+
 def get_a_new_game_number(game_mode):
     number_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
     if game_mode == 'easy':
@@ -167,8 +175,9 @@ def get_a_new_game_number(game_mode):
     if game_mode == 'hard':
         game_number = random.sample(number_pool, 6)
         return ''.join(str(num) for num in game_number)
-    if game_mode == 'easy':
-        raise NotImplementedError()
+    if game_mode == 'daily':
+        game_number = generate_numbers_by_seed(int(str((datetime.datetime.now().date())).replace('-', '')), number_of_digits=4)
+        return ''.join(str(num) for num in game_number)
     
 
 def update_game(game, number_of_tries, tries):
