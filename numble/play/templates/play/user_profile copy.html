@@ -1,0 +1,35 @@
+{% extends "./base.html" %}
+{% block content %}
+
+{% load custom_template_tags %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'play/css/game.css' %}">
+
+<div class="container">
+
+    {% if is_same_user %}<p><strong>This is you :)</strong></p>{% endif %}
+
+
+    <h1>{{ profile_user.username }}</h1>
+    <h2>{{ profile_user.first_name }} {{ profile_user.last_name }}</h2>
+
+
+    <h3>Game History:</h3>
+
+    {% for game in game_history %}
+
+    <div>
+        <p>Time: {{ game.date }} at {{ game.start_time }}</p>
+        <p>Duration: {{ game.duration|convert_to_readable_time}}</p>
+        <p>Number of Tries: {{ game.number_of_tries }}</p>
+        <p>Game Mode: {{ game.game_mode }}</p>
+        <p>Game Result: {{ game.game_won }}</p>
+    </div>
+    <br>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

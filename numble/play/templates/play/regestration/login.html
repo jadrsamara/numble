@@ -11,8 +11,6 @@
             <h1>Log in</h1>
         </legend>
 
-        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
         <label for="username"><b>Username</b></label>
         <input type="text" placeholder="Enter Username" name="username" id="username" required>
 
@@ -21,7 +19,8 @@
         <label for="password"><b>Password</b></label>
         <input type="password" placeholder="Enter Password" id="password" name="password" required>
 
-        <br><br>
+        <br>{% if error_message %}<p style="color: red;">{{ error_message }}</p>{% endif %}
+        <br>
 
     </fieldset>
     <input type="submit" value="Log in">

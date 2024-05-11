@@ -1,0 +1,25 @@
+.user_card {
+    min-width: 300px; 
+    width: 360px;
+}
+
+.user_stats_card {
+    width: 18rem; 
+    min-width: 200px;
+}
+
+@media only screen and (max-width: 600px) {
+
+    .user_card {
+        min-width: 300px;
+        width: 100%; 
+        width: auto;
+        align-items: flex-start;
+        padding-left: 10%;
+    }
+
+    .user_stats_card {
+        width: auto;
+    }
+
+}

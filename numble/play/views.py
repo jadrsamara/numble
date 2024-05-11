@@ -7,8 +7,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
-import os
-import hashlib
 import random as random
 import datetime
 import random as random_with_seed
@@ -28,10 +26,26 @@ GAME_TRIES_LIMIT = 7
 
 
 def index(request):
+
+    dark_mode = 'light'
+
+    if 'dark_mode' in request.session:
+        dark_mode = request.session['dark_mode']
+
+    print(dark_mode)        
+
     return render(
         request,
         base_template,
     )
+
+
+def switch_theme_view(request):
+    if request.session['dark_mode'] == 'light':
+        request.session['dark_mode'] = 'dark'
+    else:
+        request.session['dark_mode'] = 'light'
+    return HttpResponseRedirect(reverse(base_reverse))
 
 
 # --- User Views ---
@@ -82,7 +96,7 @@ def signup_done_view(request):
     user = User.objects.create_user(
         username=request.POST["username"],
         email=request.POST["email"],
-        password=hashlib.sha256(request.POST["password"].encode('utf-8')).hexdigest(),
+        password=request.POST["password"],
         first_name=request.POST["firstname"],
         last_name=request.POST["lastname"],
     )
@@ -118,7 +132,7 @@ def login_done_view(request):
     next_page = request.GET.get('next') if request.GET.get('next') is not None else reverse(base_reverse)
     
     username = request.POST["username"]
-    password = hashlib.sha256(request.POST["password"].encode('utf-8')).hexdigest()
+    password = request.POST["password"]
 
     user_username = authenticate(username=username, password=password)
     user_email = authenticate(email=username, password=password)
@@ -132,6 +146,9 @@ def login_done_view(request):
         return render(
             request,
             template_name,
+            {
+                "error_message": "incorrect login credentials!",
+            },
         )
 
     return HttpResponseRedirect(next_page)
@@ -180,20 +197,20 @@ def get_a_new_game_number(game_mode):
         return ''.join(str(num) for num in game_number)
     
 
-def update_game(game, number_of_tries, tries):
-    game.number_of_tries = number_of_tries,
-    game.tries = tries,
-    game.save()
+# def update_game(game, number_of_tries, tries):
+#     game.number_of_tries = number_of_tries,
+#     game.tries = tries,
+#     game.save()
 
 
-def complete_game(game, number_of_tries, tries):
-    now = timezone.now()
-    game.number_of_tries = number_of_tries,
-    game.tries = tries,
-    game.finish_time = now,
-    game.duration = now - game.start_time,
-    game.game_completed = True,
-    game.save()
+# def complete_game(game, number_of_tries, tries):
+#     now = timezone.now()
+#     game.number_of_tries = number_of_tries,
+#     game.tries = tries,
+#     game.finish_time = now,
+#     game.duration = now - game.start_time,
+#     game.game_completed = True,
+#     game.save()
 
 
 def get_user_from_request(request) -> User:
@@ -252,21 +269,18 @@ def game_view(request, game_mode):
 # @login_required(login_url='/login/')
 def game_by_id_view(request, game_mode, game_id):
 
-    game = Game.objects.filter(pk=game_id, game_completed=True, game_mode=game_mode).first()
-
-    user = get_user_from_request(request)
-
-    if game == None:
-        game = Game.objects.filter(pk=game_id, user=user, game_mode=game_mode).first()
+    game = Game.objects.filter(pk=game_id, game_mode=game_mode).first()
     
     if game == None:
         return HttpResponseNotFound()
+        
+    can_current_request_user_play = not game.game_completed and ((game.user == request.user) or ((game.user.username == 'Anonymous') and (request.user.is_anonymous)))
     
     expire_time = datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc)
-    if datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc) < timezone.now():
+    if not game.game_completed and (datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc) < timezone.now()):
         game.game_completed = True
         game.finish_time = timezone.now()
-        game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.expire_time, tzinfo=datetime.timezone.utc)
+        game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.start_time, tzinfo=datetime.timezone.utc)
         game.game_won = False
     
         game.save()
@@ -289,6 +303,7 @@ def game_by_id_view(request, game_mode, game_id):
             "game_mode_range": range(len(get_a_new_game_number(game_mode))),
             "game_mode_len": len(get_a_new_game_number(game_mode)),
             "GAME_TRIES_LIMIT": GAME_TRIES_LIMIT,
+            "can_current_request_user_play": can_current_request_user_play,
             "game": game
         },
     )
@@ -352,3 +367,43 @@ def game_submit_view(request, game_mode, game_id):
     game.save()
 
     return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+
+
+def user_profile(request, username):
+
+    profile_user = User.objects.get(username=username)
+
+    is_same_user = False
+    if request.user == profile_user:
+        is_same_user = True
+
+    game_history = Game.objects.filter(user=profile_user, game_completed=True).order_by("-pk")[:5]
+
+    template_name = "play/user_profile.html"
+
+    profile_initials = (profile_user.first_name[0] if len(profile_user.first_name)>0 else '') + (profile_user.last_name[0] if len(profile_user.last_name)>0 else '')
+    if profile_initials == '':
+        profile_initials = profile_user.username[0]
+
+    total_games = Game.objects.filter(user=profile_user, game_completed=True).count()
+    games_won = Game.objects.filter(user=profile_user, game_completed=True, game_won=True).count()
+    games_lost = total_games - games_won
+
+    player_stats = {
+        "games_played": total_games,
+        "games_won": games_won,
+        "games_lost": games_lost,
+    }
+
+    return render(
+        request,
+        template_name,
+        {
+            "is_same_user": is_same_user,
+            "profile_user": profile_user,
+            "game_history": game_history,
+            "profile_initials": profile_initials,
+            "is_friend": 'Follow', # TODO
+            "player_stats": player_stats,
+        },
+    )

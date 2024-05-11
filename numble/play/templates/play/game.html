@@ -30,7 +30,7 @@
 {% endfor %}
 </div>
 {% endfor %}
-{% if not game.game_completed %}
+{% if can_current_request_user_play %}
 <form action=" {% url 'play:game_submit_view' game_mode=game.game_mode game_id=game.pk %} " method="post">
     {% csrf_token %}
     <div class="numbers-row">

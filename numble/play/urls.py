@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path, re_path
 from django.contrib.auth import views as auth_views
 
 from . import views
@@ -14,7 +14,9 @@ urlpatterns = [
     # --- User paths ---
 
     # path("user/", views.user, name="user"), 
-    # path("user/<slug:game_mode>/", views.user_profile, name="user_profile"),
+    re_path(r"^user/(?P<username>[a-zA-Z.-_$]*)/$", views.user_profile, name="user_profile"),
+
+    path("switch_theme/", views.switch_theme_view, name="switch_theme_view"),
 
     # path("user/<slug:game_mode>/update", views.play_view, name="play_view"),
     # path("user/<slug:game_mode>/update/done/", views.play_view, name="play_view"),

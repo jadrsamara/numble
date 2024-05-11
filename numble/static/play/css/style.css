@@ -50,7 +50,7 @@
   color: black;
 }
 
-.header a.active {
+.header a._active {
   background-color: lightslategrey;
   color: white;
 }
@@ -59,7 +59,7 @@
   float: right;
 }
 
-.active {
+._active {
   visibility: hidden;
 }
 
@@ -94,7 +94,7 @@ li {
     width: 40vw;
   }
 
-  .active {
+  ._active {
     visibility: visible;
     background-color: lightslategrey;
   }

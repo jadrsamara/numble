@@ -1,6 +1,8 @@
 {% load static %}
+{% load custom_template_tags %}
 <link rel="shortcut icon" type="image/svg" href="{% static 'play/images/favicon.svg' %}">
 <link rel="stylesheet" href="{% static 'play/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'play/sass/style.sass' %}">
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,20 +12,20 @@
 <!-- Others -->
 <title>Numble</title>
 
-<html lang="en">
+<html lang="en" data-bs-theme="{% get_theme request %}">
 
 <head>
 </head>
 
-<body>
+<body >
     <header>
-        <div class="header">
+        <div class="header" >
             <div class="logo"><a href="{% url 'play:index' %}">Numble نمبل</a></div>
             <div class="header-right">
-                <a class="active" href="{% url 'play:index' %}">Numble نمبل</a>
+                <a class="_active" href="{% url 'play:index' %}">Numble نمبل</a>
                 {% if user.is_authenticated %}
                 <a href="#leaderboard">Leaderboard</a>
-                <a href="#account">Account</a>
+                <a href="{% url 'play:user_profile' request.user.username %}">Account</a>
                 <a href="{% url 'play:logout_view' %}">Log out</a>
                 {% else %}
                 <a href="#leaderboard">Leaderboard</a>

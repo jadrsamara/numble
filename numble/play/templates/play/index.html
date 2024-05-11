@@ -1,6 +1,9 @@
 {% extends "./base.html" %} 
-{% block content %} 
+{% block content %}
+{% load custom_template_tags %}
 {% load static %}
+
+<link rel="stylesheet" href="{% static 'play/css/game.css' %}">
 
 <div class="wrapper">
 <div class="wrapped">
@@ -19,7 +22,16 @@
 <br>
 <a href="{% url 'play:login_view' %}">Log in</a>
 
+{% else %}
+
+<br>
+<h3>Welcome</h3>
+<h2>{{ request.user.username }}</h2>
+
 {% endif %}
+
+<p><a class="btn gray" style="padding: 12px; margin: 0px;" href="{% url 'play:switch_theme_view' %}">Switch theme Light/Dark mode</a></p>
+
 
 </div>
 </div>

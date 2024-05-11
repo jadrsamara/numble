@@ -32,6 +32,14 @@ def get_value_1d(l, i):
         return None
     
 
+@register.simple_tag
+def get_theme(request):
+    try:
+        return request.session['dark_mode']
+    except:
+        return 'light'
+    
+
 def pretty_time_delta(seconds):
     seconds = int(seconds)
     days, seconds = divmod(seconds, 86400)
