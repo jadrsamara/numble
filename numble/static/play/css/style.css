@@ -23,6 +23,17 @@
 
 /* - - - End of Fonts - - -  */
 
+/* - - - Start of Base - - -  */
+
+.header-bg {
+  background-color: #f1f1f1;
+  -webkit-box-shadow: 0px 0px 60px -14px rgba(0, 0, 0, 0.34);
+  -moz-box-shadow: 0px 0px 60px -14px rgba(0, 0, 0, 0.34);
+  box-shadow: 0px 0px 60px -14px rgba(0, 0, 0, 0.34);
+}
+
+/* - - - End of Base - - -  */
+
 .header {
   overflow: hidden;
   background-color: #f1f1f1;
@@ -88,7 +99,7 @@ li {
   text-align: left;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 576px) {
 
   .index-logo {
     width: 40vw;

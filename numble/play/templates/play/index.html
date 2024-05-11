@@ -1,39 +1,56 @@
-{% extends "./base.html" %} 
+{% extends "./base.html" %}
 {% block content %}
-{% load custom_template_tags %}
 {% load static %}
 
 <link rel="stylesheet" href="{% static 'play/css/game.css' %}">
 
-<div class="wrapper">
-<div class="wrapped">
+<div class="container d-flex align-items-center justify-content-center flex-column">
 
-<img class="index-logo" type="image/svg" src="{% static 'play/images/favicon.svg' %}">
-
-<a href="{% url 'play:play_view' %}"><h1>Play Now!</h1></a>
-
-{% if not user.is_authenticated %}
-<br>
-<h2>Sign up / Log in</h2>
-<h3>to get stats and play more modes</h3>
-<br>
-<a href="{% url 'play:signup_view' %}">Sign up</a>
-<br>
-<br>
-<a href="{% url 'play:login_view' %}">Log in</a>
-
-{% else %}
-
-<br>
-<h3>Welcome</h3>
-<h2>{{ request.user.username }}</h2>
-
-{% endif %}
-
-<p><a class="btn gray" style="padding: 12px; margin: 0px;" href="{% url 'play:switch_theme_view' %}">Switch theme Light/Dark mode</a></p>
-
-
-</div>
+    <div>
+        <div class="numbers-row">
+            <input type="number" value="0" class="btn_ orange row-item" style="width: auto;" disabled>
+            <input type="number" value="1" class="btn_ gray row-item" style="width: auto;" disabled>
+        </div>
+        <div class="numbers-row">
+            <input type="number" value="4" class="btn_ gray row-item" style="width: auto;" disabled>
+            <input type="number" value="5" class="btn_ green row-item" style="width: auto;" disabled>
+        </div>
+        <div class="numbers-row">
+            <input type="number" value="7" class="btn_ green row-item" style="width: auto;" disabled>
+            <input type="number" value="8" class="btn_ orange row-item" style="width: auto;" disabled>
+        </div>
+    </div>
+    <br>
+    <div>
+        <h2>Can you guess the number?</h2>
+    </div>
+    <br>
+    <div>
+        <a href="{% url 'play:play_view' %}">
+            <h1 class="btn_ white">Play Now!</h1>
+        </a>
+    </div>
+    <br>
+    <br>
+    {% if not user.is_authenticated %}
+    <div>
+        <h4>Sign up / Log in</h4>
+    </div>
+    <div>
+        <h5 class="text-muted">to get stats and play more modes</h5>
+    </div>
+    <div>
+        <a class="btn_ blue" href="{% url 'play:signup_view' %}">Sign up</a>
+        <a class="btn_ blue" href="{% url 'play:login_view' %}">Log in</a>
+    </div>
+    {% else %}
+    <div>
+        <h3>Welcome</h3>
+    </div>
+    <div>
+        <h2>{{ request.user.username }}</h2>
+    </div>
+    {% endif %}
 </div>
 
 {% endblock %}

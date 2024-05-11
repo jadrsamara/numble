@@ -26,14 +26,6 @@ GAME_TRIES_LIMIT = 7
 
 
 def index(request):
-
-    dark_mode = 'light'
-
-    if 'dark_mode' in request.session:
-        dark_mode = request.session['dark_mode']
-
-    print(dark_mode)        
-
     return render(
         request,
         base_template,
@@ -41,11 +33,21 @@ def index(request):
 
 
 def switch_theme_view(request):
+
+    page = reverse(base_reverse)
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        page = referer.replace(request.META.get('HTTP_ORIGIN'), '')
+
+    if 'dark_mode' not in request.session:
+        request.session['dark_mode'] = 'dark'
+        return HttpResponseRedirect(page)
+    
     if request.session['dark_mode'] == 'light':
         request.session['dark_mode'] = 'dark'
     else:
         request.session['dark_mode'] = 'light'
-    return HttpResponseRedirect(reverse(base_reverse))
+    return HttpResponseRedirect(page)
 
 
 # --- User Views ---
@@ -227,7 +229,7 @@ def game_view(request, game_mode):
     Redirects to the new / unfinished game
     """
 
-    if game_mode not in ['easy', 'medium', 'hard', 'daily', '2v2']:
+    if game_mode not in ['easy', 'medium', 'hard', 'daily', '1v1']:
         return HttpResponseNotFound()
     
     user = get_user_from_request(request)
@@ -282,7 +284,7 @@ def game_by_id_view(request, game_mode, game_id):
         game.finish_time = timezone.now()
         game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.start_time, tzinfo=datetime.timezone.utc)
         game.game_won = False
-    
+        can_current_request_user_play = False
         game.save()
     
     tries = []

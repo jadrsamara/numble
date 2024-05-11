@@ -10,7 +10,9 @@
 
 {% if game.user.username == 'Tutorial' %}
 <h2>How to play</h2>
+<br>
 <h4>Guess the Numble in {{ GAME_TRIES_LIMIT }} tries.</h4>
+<br>
 <p>Each guess must be a valid {{ game_mode_len }}-digit number.</p>
 <p>The color of the tiles will change to show how close your guess was to the number.</p>
 <ul>
@@ -19,14 +21,14 @@
     <li><span style="color: #2ecc71; font-weight: bold;">Green</span>: the digit is in the number and in the correct spot.</li>
 </ul>
 {% else %}
-<h2>Guess the {{ game_mode_len }}-digit number!</h2>
+<h3>Guess the {{ game_mode_len }}-digit number!</h3>
 
 {% endif %}
 
 {% for i in game_tries_range %}
 <div class="numbers-row">
 {% for j in game_mode_range %}
-    <input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1" value="{% get_value_2d game_tries i j %}" class="btn {% get_color game i j %} row-item" disabled>
+    <input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1" value="{% get_value_2d game_tries i j %}" class="btn_ {% get_color game i j %} row-item" disabled>
 {% endfor %}
 </div>
 {% endfor %}
@@ -35,11 +37,11 @@
     {% csrf_token %}
     <div class="numbers-row">
     {% for i in game_mode_range %}
-    <input type="number" id="input_cell{{i}}" name="input_cell{{i}}" maxlength="1" class="btn white  row-item" autofocus onfocus="this.select(); this.click();" oninput="javascript: if (this.value.length >= this.maxLength) {this.value = this.value.slice(0, this.maxLength); this.nextElementSibling.focus();}" required>
+    <input type="number" id="input_cell{{i}}" name="input_cell{{i}}" maxlength="1" class="btn_ white  row-item" autofocus onfocus="this.select(); this.click();" oninput="javascript: if (this.value.length >= this.maxLength) {this.value = this.value.slice(0, this.maxLength); this.nextElementSibling.focus();}" required>
     {% endfor %}
     </div>
     <br>
-    <div class="numbers-row"><input type="submit" class="btn blue submit" value="Submit"></div>
+    <div class="numbers-row"><input type="submit" class="btn_ blue submit" value="Submit"></div>
 </form>
 {% endif %}
 {% if game.game_completed %}
@@ -47,16 +49,17 @@
 {% if game.game_completed and game.user == request.user %}
 <p><h2>Game {% if game.game_won %}Won :){% else %}Lose :({% endif %}</h2></p>
 {% endif %}{% if game.game_completed and game.user != request.user %}
-<p><h2>{% if game.user.username != 'Anonymous' %}{{ game.user.username }}{% else %}Game{% endif %}{% if game.game_won %} Won{% else %} Lose{% endif %}</h2></p>
+<p><h2>{% if game.user.username != 'Anonymous' %}{{ game.user.username }}{% else %}Game{% endif %}{% if game.game_won %} Won{% else %} Loss{% endif %}</h2></p>
 {% endif %}
 
 {% if not game.game_won %}
 <p><strong>Correct number:</strong></p>
 <div class="numbers-row">
 {% for i in game_mode_range %}
-<input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1" class="btn yellow row-item" value="{% get_value_1d game.number i %}" disabled>
+<input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1" class="btn_ yellow row-item" value="{% get_value_1d game.number i %}" disabled>
 {% endfor %}
 </div>
+<br>
 {% endif %}
 <p><strong>Game Stats:</strong></p>
     <li>Number of tries: {{game.number_of_tries}}</li>
