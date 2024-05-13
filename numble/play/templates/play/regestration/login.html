@@ -1,15 +1,23 @@
 {% extends "../base.html" %} 
 {% block content %} 
 
+{% load static %}
+<link rel="stylesheet" href="{% static 'play/css/game.css' %}">
 
+<br>
+<br>
+<br>
+<br>
 
-
+<div class="container">
 <form action="{% url 'play:login_done_view' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" method="post">
     {% csrf_token %}
     <fieldset>
         <legend>
             <h1>Log in</h1>
         </legend>
+        <br>
+        <br>
 
         <label for="username"><b>Username</b></label>
         <input type="text" placeholder="Enter Username" name="username" id="username" required>
@@ -23,9 +31,9 @@
         <br>
 
     </fieldset>
-    <input type="submit" value="Log in">
+    <input class="btn_ blue" type="submit" value="Log in">
 </form>
-
+</div>
 
 
 

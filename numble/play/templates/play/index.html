@@ -5,25 +5,30 @@
 <link rel="stylesheet" href="{% static 'play/css/game.css' %}">
 
 <div class="container d-flex align-items-center justify-content-center flex-column">
-
+    <br>
+    <br>
     <div>
         <div class="numbers-row">
-            <input type="number" value="0" class="btn_ orange row-item" style="width: auto;" disabled>
-            <input type="number" value="1" class="btn_ gray row-item" style="width: auto;" disabled>
+            <input type="number" value="0" class="btn_ orange row-item center-logo" disabled>
+            <input type="number" value="1" class="btn_ gray row-item center-logo" disabled>
+            <input type="number" value="3" class="btn_ green row-item center-logo" disabled>
         </div>
         <div class="numbers-row">
-            <input type="number" value="4" class="btn_ gray row-item" style="width: auto;" disabled>
-            <input type="number" value="5" class="btn_ green row-item" style="width: auto;" disabled>
+            <input type="number" value="4" class="btn_ gray row-item center-logo" disabled>
+            <input type="number" value="5" class="btn_ green row-item center-logo" disabled>
+            <input type="number" value="2" class="btn_ orange row-item center-logo" disabled>
         </div>
         <div class="numbers-row">
-            <input type="number" value="7" class="btn_ green row-item" style="width: auto;" disabled>
-            <input type="number" value="8" class="btn_ orange row-item" style="width: auto;" disabled>
+            <input type="number" value="7" class="btn_ green row-item center-logo" disabled>
+            <input type="number" value="8" class="btn_ orange row-item center-logo" disabled>
+            <input type="number" value="6" class="btn_ gray row-item center-logo" disabled>
         </div>
     </div>
     <br>
     <div>
-        <h2>Can you guess the number?</h2>
+        <h4>Can you guess the number?</h4>
     </div>
+    <br>
     <br>
     <div>
         <a href="{% url 'play:play_view' %}">
@@ -44,6 +49,8 @@
         <a class="btn_ blue" href="{% url 'play:login_view' %}">Log in</a>
     </div>
     {% else %}
+    <br>
+    <br>
     <div>
         <h3>Welcome</h3>
     </div>

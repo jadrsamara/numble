@@ -11,7 +11,7 @@
 
     <div class="card-group">
         <div class="card mb-3 border user_card">
-            <div class="row">
+            <div class="row no_card_flex_wrap">
                 <div class="col" style="text-align: right;">
                     <span style="font-size: 300%; line-height: 300%;">{{ profile_initials }}</span>
                 </div>
@@ -33,7 +33,7 @@
         <div class="card text-center mb-3 border user_stats_card">
             <div class="card-body">
                 <br>
-                <h5 class="card-title">Total Games Played</h5>
+                <h5 class="card-title">Total Games</h5>
                 <h2 class="card-text">{{ player_stats.games_played }}</h2>
             </div>
         </div>
@@ -53,10 +53,11 @@
     </div>
 
     <h3>Game History</h3>
+    {% if not is_history_empty %}
     <h5>Last 5 games:</h5>
     <div class="card-group">
         {% for game in game_history %}
-        <div class="card text-center mb-3 border" style="width: 18rem; min-width: 150px;">
+        <div class="card text-center mb-3 border card_override">
             <div class="card-body">
                 <span class="half-btn blue
                 {% if game.game_mode == 'easy' %}green{% endif %}
@@ -69,7 +70,7 @@
                 <span class="half-btn blue no-bg-color">{{ game.number_of_tries }} Tries</span>
                 <span class="half-btn blue no-bg-color">{{ game.duration|convert_to_readable_time}}</span>
                 <br>
-                <span class="half-btn blue no-bg-color">{{ game.date }} at {{ game.start_time }}</span>
+                <span class="half-btn blue no-bg-color">{{ game.date }}</span>
                 <br>
                 <br>
                 <a href="{% url 'play:game_by_id_view' game_mode=game.game_mode game_id=game.pk %}" class="btn btn-primary">View Game</a>
@@ -77,7 +78,9 @@
         </div>
         {% endfor %}
     </div>
-
+    {% else %}
+    <h5>There are no previously played games</h5>
+    {% endif %}
 </div>
 
 {% endblock %}

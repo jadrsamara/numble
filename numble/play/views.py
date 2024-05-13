@@ -395,6 +395,7 @@ def user_profile(request, username):
         "games_played": total_games,
         "games_won": games_won,
         "games_lost": games_lost,
+        "is_history_empty": len(game_history) == 0,
     }
 
     return render(
