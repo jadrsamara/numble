@@ -108,7 +108,6 @@ li {
   align-items: center;
 }
 
-
 @media only screen and (max-width: 576px) {
 
   .index-logo {
@@ -146,5 +145,10 @@ li {
     font-size: 3.5vw;
     line-height: 20px;
     border-radius: 2px;
+  }
+
+  .nav-link{
+    display: flex;
+    justify-content: center;
   }
 }

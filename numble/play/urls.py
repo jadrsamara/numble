@@ -14,7 +14,7 @@ urlpatterns = [
     # --- User paths ---
 
     # path("user/", views.user, name="user"), 
-    re_path(r"^user/(?P<username>[a-zA-Z.-_$]*)/$", views.user_profile, name="user_profile"),
+    re_path(r"^user/(?P<username>[a-zA-Z\.\_]*)/$", views.user_profile, name="user_profile"),
 
     path("switch_theme/", views.switch_theme_view, name="switch_theme_view"),
 
@@ -35,9 +35,6 @@ urlpatterns = [
     # path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
     # path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
 
-    # path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    # path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
-
     # --- App ---
 
     path("play/", views.play_view, name="play_view"),
@@ -45,5 +42,7 @@ urlpatterns = [
     path("games/<slug:game_mode>/", views.game_view, name="game_view"),
     path("games/<slug:game_mode>/<int:game_id>/", views.game_by_id_view, name="game_by_id_view"),
     path("games/<slug:game_mode>/<int:game_id>/submit/", views.game_submit_view, name="game_submit_view"),
+
+    path("leaderboard/", views.leaderboard_view, name="leaderboard_view"),
 ]
 

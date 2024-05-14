@@ -6,12 +6,15 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.db.models import Q
 
 import random as random
 import datetime
 import random as random_with_seed
+import re
 
 from .models import Game
+from .templatetags.custom_template_tags import convert_to_readable_time
 
 
 base_template = "play/index.html"
@@ -62,6 +65,22 @@ def signup_view(request):
         template_name,
     )
 
+ 
+def is_valid_email(email):
+    regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+    if(re.fullmatch(regex, email)):
+        return True
+    else:
+        return False
+    
+
+def is_valid_username(username):
+    regex = r'\b[a-zA-Z\.\_]*\b'
+    if(re.fullmatch(regex, username)):
+        return True
+    else:
+        return False
+
 
 @require_http_methods(["POST"])
 def signup_done_view(request):
@@ -69,6 +88,34 @@ def signup_done_view(request):
     sign_up_template = 'play/regestration/signup.html'
 
     def validate(request):
+
+        if len(request.POST["email"]) > 20 or len(request.POST["username"]) > 20:
+            return render(
+                request,
+                sign_up_template,
+                {
+                    "error_message": "Email or Username exceeded the character limit",
+                },
+            )
+        
+        if not is_valid_email(request.POST["email"]):
+            return render(
+                request,
+                sign_up_template,
+                {
+                    "error_message": "Email is invalid",
+                },
+            )
+        
+        if not is_valid_username(request.POST["username"]):
+            return render(
+                request,
+                sign_up_template,
+                {
+                    "error_message": "Username is invalid, it should only contain: . or _",
+                },
+            )
+
         email = User.objects.filter(email=request.POST["email"])
         username = User.objects.filter(username=request.POST["username"])
 
@@ -197,22 +244,6 @@ def get_a_new_game_number(game_mode):
     if game_mode == 'daily':
         game_number = generate_numbers_by_seed(int(str((datetime.datetime.now().date())).replace('-', '')), number_of_digits=4)
         return ''.join(str(num) for num in game_number)
-    
-
-# def update_game(game, number_of_tries, tries):
-#     game.number_of_tries = number_of_tries,
-#     game.tries = tries,
-#     game.save()
-
-
-# def complete_game(game, number_of_tries, tries):
-#     now = timezone.now()
-#     game.number_of_tries = number_of_tries,
-#     game.tries = tries,
-#     game.finish_time = now,
-#     game.duration = now - game.start_time,
-#     game.game_completed = True,
-#     game.save()
 
 
 def get_user_from_request(request) -> User:
@@ -413,3 +444,41 @@ def user_profile(request, username):
             "is_history_empty": is_history_empty,
         },
     )
+
+def leaderboard_view(request):
+    """
+    TODO: create a tabel for top 20 games + a tabel for top user game (his best game for each mode)
+          these tabels should be updated when the game is complete and won
+
+          leaderboard view should only read and display this table
+          profile view should read the top user game table and add them as stats
+
+          implement a today's leaderboard
+    """
+    top_20_games = []
+    anonymous_user = User.objects.get(username='Anonymous')
+    for i in range(1, 8):
+
+        if len(top_20_games) >= 20:
+            break
+        
+        today_date = datetime.datetime.now(datetime.timezone.utc).date()
+
+        games = Game.objects.filter(~Q(user=anonymous_user), date=today_date, game_completed=True, number_of_tries=i)
+        top_20_games += list(games)
+
+        if len(games) >= 20:
+            break
+
+    print(len(top_20_games))
+    for game in top_20_games:
+        print(game.user)
+        print(game.number_of_tries)
+        print(convert_to_readable_time(game.duration))
+
+    is_list_empty = len(top_20_games) == 0
+    
+    return render(
+            request,
+            base_template,
+           )
