@@ -1,55 +1,57 @@
-{% extends "../base.html" %} 
-{% block content %} 
+{% extends "../base.html" %}
+{% block content %}
 
-{% load static %}
-<link rel="stylesheet" href="{% static 'play/css/game.css' %}">
+<br><br>
 
-<br>
-<br>
-<br>
-<br>
+<div class="container" style="width: 400px;">
+    <form action="{% url 'play:signup_done_view' %}" method="post">
+        {% csrf_token %}
+        <fieldset>
+            <legend>
+                <h1 style="text-align: center;">Create a new account</h1>
+            </legend>
 
-<div class="container">
-<form action="{% url 'play:signup_done_view' %}" method="post">
-    {% csrf_token %}
-    <fieldset>
-        <legend>
-            <h1>Create a new account</h1>
-        </legend>
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-        <br><br>
+            <div class="form-container">
+                <div class="mb-3">
+                    <label class="form-label" for="firstname"><b>First Name</b></label>
+                    <input class="form-control" type="text" placeholder="Enter First Name" name="firstname" id="firstname" required>
+                </div>
 
-        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                <div class="form-row">
+                    <label class="form-label" for="lastname"><b>Last Name</b></label>
+                    <input class="form-control" type="text" placeholder="Enter Last Name" name="lastname" id="lastname" required>
+                </div>
 
-        <label for="firstname"><b>First Name</b></label>
-        <input type="text" placeholder="Enter First Name" name="firstname" id="firstname" required>
+                <div class="form-row">
+                    <label class="form-label" for="username"><b>Username</b></label>
+                    <input class="form-control" type="text" placeholder="Enter Username" name="username" id="username" pattern="[A-Za-z_-]" required>
+                </div>
 
-        <br><br>
+                <div class="form-row">
+                    <label class="form-label" for="email"><b>Email</b></label>
+                    <input class="form-control" type="email" placeholder="Enter Email" name="email" id="email" required>
+                </div>
 
-        <label for="lastname"><b>Last Name</b></label>
-        <input type="text" placeholder="Enter Last Name" name="lastname" id="lastname" required>
+                <div class="form-row">
+                    <label class="form-label" for="password"><b>Password</b></label>
+                    <input class="form-control" type="password" placeholder="Enter Password" id="password" name="password"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
+                        required>
+                </div>
+            </div>
 
-        <br><br>
+        </fieldset>
+        <div class="center-a-div">
+            <input class="btn_ blue" style="width: max-content;" type="submit" value="Create account">
+        </div>
+    </form>
 
-        <label for="username"><b>Username</b></label>
-        <input type="text" placeholder="Enter Username" name="username" id="username" pattern="[A-Za-z_-]" required>
-        
-        <br><br>
+    <div class="dropdown-divider"></div>
+    <p>Already have an account? <a href="{% url 'play:login_view' %}">Log in</a></p>
 
-        <label for="email"><b>Email</b></label>
-        <input type="email" placeholder="Enter Email" name="email" id="email" required>
-
-        <br><br>
-
-        <label for="password"><b>Password</b></label>
-        <input type="password" placeholder="Enter Password" id="password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
-        title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required>
-
-        <br><br>
-
-    </fieldset>
-    <input class="btn_ blue" type="submit" value="Create account">
-</form>
 </div>
 
 

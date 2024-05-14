@@ -1,38 +1,38 @@
-{% extends "../base.html" %} 
-{% block content %} 
+{% extends "../base.html" %}
+{% block content %}
 
-{% load static %}
-<link rel="stylesheet" href="{% static 'play/css/game.css' %}">
+<br><br>
 
-<br>
-<br>
-<br>
-<br>
+<div class="container" style="width: 400px;">
 
-<div class="container">
-<form action="{% url 'play:login_done_view' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" method="post">
-    {% csrf_token %}
-    <fieldset>
+    <form class="px-4 py-3"
+        action="{% url 'play:login_done_view' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" method="post">
+        {% csrf_token %}
+
         <legend>
             <h1>Log in</h1>
         </legend>
-        <br>
-        <br>
 
-        <label for="username"><b>Username</b></label>
-        <input type="text" placeholder="Enter Username" name="username" id="username" required>
+        <div class="mb-3">
+            <label class="form-label" for="username"><b>Username</b></label>
+            <input class="form-control" type="text" placeholder="Enter Username" name="username" id="username" required>
+        </div>
 
-        <br><br>
+        <div class="mb-3">
+            <label class="form-label" for="password"><b>Password</b></label>
+            <input class="form-control" type="password" placeholder="Enter Password" id="password" name="password" required>
+        </div>
 
-        <label for="password"><b>Password</b></label>
-        <input type="password" placeholder="Enter Password" id="password" name="password" required>
+        {% if error_message %}<p style="color: red;">{{ error_message }}</p>{% endif %}
+        
+        <div class="center-a-div">
+            <button type="submit" class="half-btn blue">Sign in</button>
+        </div>
+    </form>
 
-        <br>{% if error_message %}<p style="color: red;">{{ error_message }}</p>{% endif %}
-        <br>
-
-    </fieldset>
-    <input class="btn_ blue" type="submit" value="Log in">
-</form>
+    <div class="dropdown-divider"></div>
+    <p>New around here? <a href="{% url 'play:signup_view' %}">Sign up</a></p>
+    <!-- <a class="dropdown-item" href="#">Forgot password?</a> -->
 </div>
 
 

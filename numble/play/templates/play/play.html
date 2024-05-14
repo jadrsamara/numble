@@ -1,27 +1,26 @@
 {% extends "./base.html" %}
 {% block content %}
-{% load static %}
-<link rel="stylesheet" href="{% static 'play/css/game.css' %}">
 
 <div class="wrapper">
     <div class="wrapped">
 
+        <br><br>
+
         <h1>Select Game Mode:</h1>
-
-        <h2>Daily Numble</h2>
-
-        <p><a class="btn blue" style="padding: 12px; margin: 0px;" href="{% url 'play:game_view' 'daily' %}">daily</a></p>
-
-        <h2>Normal game modes</h2>
-        <p><a class="btn green" style="padding: 12px; margin: 0px;" href="{% url 'play:game_view' 'easy' %}">easy</a></p>
-        <p><a class="btn orange" style="padding: 12px; margin: 0px;" href="{% url 'play:game_view' 'medium' %}">medium</a></p>
-        <p><a class="btn red" style="padding: 12px; margin: 0px;" href="{% url 'play:game_view' 'hard' %}">hard</a></p>
+        <div class="d-flex align-items-center justify-content-center flex-row menu">
+            <p><a class="btn_ green menu-item" href="{% url 'play:game_view' 'easy' %}">easy</a></p>
+            <p><a class="btn_ orange menu-item" href="{% url 'play:game_view' 'medium' %}">medium</a></p>
+            <p><a class="btn_ red menu-item" href="{% url 'play:game_view' 'hard' %}">hard</a></p>
+            <p><a class="btn_ blue menu-item" href="{% url 'play:game_view' 'daily' %}">daily</a></p>
+        </div>
+        
+        <br>
+        
         <h2>Play with a friend</h2>
         <p>( Needs to be signed in )</p>
+        <p><a class="btn_ blue menu-item" href="{% url 'play:game_view' '2v2' %}">2v2</a></p>
 
-        <p><a class="btn blue" style="padding: 12px; margin: 0px;" href="{% url 'play:game_view' '2v2' %}">2v2</a></p>
-
-
+        <br>
         <p>Don't know how to play? see <a href="{% url 'play:game_by_id_view' 'easy' 107 %}">How to play.</a>
 
     </div>

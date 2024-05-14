@@ -1,14 +1,19 @@
-.user_card {
+/* .user_card {
     min-width: 300px;
     width: 100%; 
     width: min-content;
     align-items: flex-start;
     padding-left: 10%;
+} */
+
+.user_card {
+    min-width: 300px;
+    word-break: break-all;
 }
 
 .user_stats_card {
     width: 18rem; 
-    min-width: 200px;
+    min-width: 150px;
 }
 
 .card_override {
@@ -16,15 +21,22 @@
     min-width: 150px;
 }
 
+.card-body{
+    min-width: 200px;
+    /* word-break:keep-all; */
+}
+
+
 @media only screen and (max-width: 600px) {
 
     .user_card {
-        min-width: 200px;
-        width: 100%; 
-        width: min-content;
+        min-width: 300px;
+        /* width: 100%;  */
+        /* width: max-content; */
         align-items: center;
-        padding-left: 5%;
+        /* padding-left: 5%; */
         flex-grow: 1;
+        word-break: break-all;
     }
 
     .no_card_flex_wrap {

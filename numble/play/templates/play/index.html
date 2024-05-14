@@ -1,8 +1,5 @@
 {% extends "./base.html" %}
 {% block content %}
-{% load static %}
-
-<link rel="stylesheet" href="{% static 'play/css/game.css' %}">
 
 <div class="container d-flex align-items-center justify-content-center flex-column">
     <br>
@@ -45,8 +42,8 @@
         <h5 class="text-muted">to get stats and play more modes</h5>
     </div>
     <div>
-        <a class="btn_ blue" href="{% url 'play:signup_view' %}">Sign up</a>
-        <a class="btn_ blue" href="{% url 'play:login_view' %}">Log in</a>
+        <a class="half-btn blue" href="{% url 'play:signup_view' %}">Sign up</a>
+        <a class="half-btn blue" href="{% url 'play:login_view' %}">Log in</a>
     </div>
     {% else %}
     <br>

@@ -243,7 +243,7 @@ def game_view(request, game_mode):
         game = Game.objects.create_game(
             user = user,
             game_mode = game_mode, 
-            number = get_a_new_game_number(game_mode)
+            number = get_a_new_game_number(game_mode),
         )
 
     game_id = game.pk
@@ -306,7 +306,7 @@ def game_by_id_view(request, game_mode, game_id):
             "game_mode_len": len(get_a_new_game_number(game_mode)),
             "GAME_TRIES_LIMIT": GAME_TRIES_LIMIT,
             "can_current_request_user_play": can_current_request_user_play,
-            "game": game
+            "game": game,
         },
     )
 
@@ -391,11 +391,13 @@ def user_profile(request, username):
     games_won = Game.objects.filter(user=profile_user, game_completed=True, game_won=True).count()
     games_lost = total_games - games_won
 
+    is_history_empty = len(game_history) == 0
+    print(is_history_empty)
+
     player_stats = {
         "games_played": total_games,
         "games_won": games_won,
         "games_lost": games_lost,
-        "is_history_empty": len(game_history) == 0,
     }
 
     return render(
@@ -408,5 +410,6 @@ def user_profile(request, username):
             "profile_initials": profile_initials,
             "is_friend": 'Follow', # TODO
             "player_stats": player_stats,
+            "is_history_empty": is_history_empty,
         },
     )
