@@ -1,0 +1,62 @@
+{% extends "./base.html" %}
+{% block content %}
+{% load custom_template_tags %}
+
+<div class="container">
+
+    <br>
+
+    <h1 style="text-align: center;">Leaderboard</h1>
+
+    <div class="col-12 center-a-div">
+        <label class="p-2">Game Mode: </label>
+        <select class="form-select" style="width: 120px;" onchange="redirect(this)">
+            <option selected>{{ game_mode }}</option>
+            {% for option in other_modes %}
+            <option id="select_game_mode" name="{{ option }}" value="{{ option }}">{{ option }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <br>
+    
+    <div class="d-flex align-items-center justify-content-center flex-column">
+        {% if not is_list_empty %}
+        {% for leaderboard_game in top_games %}
+        <div>
+            <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Username">{{ leaderboard_game.user.username }} </span>
+            <span class="half-btn blue no-bg-color
+                        {% if leaderboard_game.rank == 1 %}yellow{% endif %}
+                        {% if leaderboard_game.rank == 2 %}orange{% endif %}
+                        {% if leaderboard_game.rank == 3 %}red{% endif %}
+                        " data-bs-toggle="tooltip" data-bs-placement="top" 
+                        title="Game Result">{{ leaderboard_game.rank }}{% if leaderboard_game.rank == 1 %} 🏆{% endif %}</span>
+            <span class="half-btn blue
+                        {% if leaderboard_game.game.game_mode == 'easy' %}green{% endif %}
+                        {% if leaderboard_game.game.game_mode == 'medium' %}orange{% endif %}
+                        {% if leaderboard_game.game.game_mode == 'hard' %}red{% endif %}
+                        no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Game Mode">{{ leaderboard_game.game.game_mode }}</span>
+            <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Number of Tries">{{ leaderboard_game.game.number_of_tries }} 🎯</span>
+            <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Game Duration">{{ leaderboard_game.game.duration|convert_to_readable_time}} ⏲️</span>
+            <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ game.date }} {{ game.start_time }}">🗓️ {{ leaderboard_game.game.date }}</span>
+            <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="game id">{{ leaderboard_game.game.pk }}</span>
+            </ul>
+        </div>
+        <br>
+        {% endfor %}
+        {% else %}
+        <br>
+        <h5 style="text-align: center;">There are no games to be displayed</h5>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function redirect(selectObj) {
+    let idx = selectObj.selectedIndex; 
+    let which = selectObj.options[idx].value; 
+    location.replace(`{% url 'play:leaderboard_view' %}?game_mode=${which}`)
+}
+</script>
+
+{% endblock %}

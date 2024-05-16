@@ -6,14 +6,14 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import F
 
 import random as random
 import datetime
 import random as random_with_seed
 import re
 
-from .models import Game
+from .models import Game, Leaderboard
 from .templatetags.custom_template_tags import convert_to_readable_time
 
 
@@ -21,7 +21,7 @@ base_template = "play/index.html"
 base_reverse = "play:index"
 
 GAME_TRIES_LIMIT = 7
-
+game_modes = ['easy', 'medium', 'hard', 'daily', '1v1']
 
 
 
@@ -242,7 +242,7 @@ def get_a_new_game_number(game_mode):
         game_number = random.sample(number_pool, 6)
         return ''.join(str(num) for num in game_number)
     if game_mode == 'daily':
-        game_number = generate_numbers_by_seed(int(str((datetime.datetime.now().date())).replace('-', '')), number_of_digits=4)
+        game_number = generate_numbers_by_seed(int(str((datetime.datetime.now(datetime.timezone.utc).date())).replace('-', '')), number_of_digits=4)
         return ''.join(str(num) for num in game_number)
 
 
@@ -260,7 +260,7 @@ def game_view(request, game_mode):
     Redirects to the new / unfinished game
     """
 
-    if game_mode not in ['easy', 'medium', 'hard', 'daily', '1v1']:
+    if game_mode not in game_modes:
         return HttpResponseNotFound()
     
     user = get_user_from_request(request)
@@ -342,6 +342,49 @@ def game_by_id_view(request, game_mode, game_id):
     )
 
 
+def add_game_to_leaderboard_if_deserved(game: Game, user: User, game_mode: str):
+
+    top_games = Leaderboard.objects.filter(game_mode=game_mode)
+    is_on_leaderboard = False
+
+    top_games = sorted(list(top_games), key=lambda x: x.rank, reverse=False)
+
+    if len(top_games) == 0:
+        Leaderboard.objects.create_leaderboard_item(game, user, game_mode, 1)
+        return
+
+    last_leaderboard_game = None
+    already_created = False
+    
+
+    # TODO: shift in the right place
+
+    for leaderboard_game in top_games:
+
+        if is_on_leaderboard:
+            leaderboard_game.rank = F("rank") + 1
+            leaderboard_game.save()
+            continue
+
+        if game.number_of_tries <= leaderboard_game.game.number_of_tries:
+            if game.duration < leaderboard_game.game.duration:
+                Leaderboard.objects.create_leaderboard_item(game, user, game_mode, leaderboard_game.rank)
+                last_leaderboard_game = leaderboard_game
+                is_on_leaderboard = True
+                already_created = True
+
+                leaderboard_game.rank = F("rank") + 1
+                leaderboard_game.save()
+
+    if len(top_games) < 20 and not already_created:
+        Leaderboard.objects.create_leaderboard_item(game, user, game_mode, len(top_games) + 1)
+        return
+    
+    if is_on_leaderboard and len(top_games) > 20:
+        last_leaderboard_game.delete()
+                    
+
+
 # @login_required(login_url='/login/')
 @require_http_methods(["POST"])
 def game_submit_view(request, game_mode, game_id):
@@ -396,6 +439,7 @@ def game_submit_view(request, game_mode, game_id):
 
         if game.number == new_number_try:
             game.game_won = True
+            add_game_to_leaderboard_if_deserved(game, user, game_mode)
     
     game.save()
 
@@ -455,30 +499,31 @@ def leaderboard_view(request):
 
           implement a today's leaderboard
     """
-    top_20_games = []
-    anonymous_user = User.objects.get(username='Anonymous')
-    for i in range(1, 8):
 
-        if len(top_20_games) >= 20:
-            break
-        
-        today_date = datetime.datetime.now(datetime.timezone.utc).date()
+    template_name = "play/leaderboard.html"
 
-        games = Game.objects.filter(~Q(user=anonymous_user), date=today_date, game_completed=True, number_of_tries=i)
-        top_20_games += list(games)
+    request_game_mode = request.GET.get('game_mode')
+    if request_game_mode in game_modes:
+        top_games = Leaderboard.objects.filter(game_mode=request_game_mode)
+    else:
+        top_games = Leaderboard.objects.filter(game_mode='easy')
+        request_game_mode = 'easy'
 
-        if len(games) >= 20:
-            break
+    top_games = sorted(list(top_games), key=lambda x: x.rank, reverse=False)
 
-    print(len(top_20_games))
-    for game in top_20_games:
-        print(game.user)
-        print(game.number_of_tries)
-        print(convert_to_readable_time(game.duration))
+    other_modes = game_modes[:]
+    other_modes.remove('1v1')
+    other_modes.remove(request_game_mode)
 
-    is_list_empty = len(top_20_games) == 0
+    is_list_empty = len(top_games) == 0
     
     return render(
             request,
-            base_template,
+            template_name,
+            {
+                "is_list_empty": is_list_empty,
+                "top_games" : top_games,
+                "game_mode": request_game_mode,
+                "other_modes": other_modes,
+            }
            )

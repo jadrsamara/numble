@@ -46,3 +46,41 @@ class Game(models.Model):
     game_won = models.BooleanField(default=False)
 
     objects = GameManager()
+
+
+class LeaderboardManager(models.Manager):
+    def create_leaderboard_item(self, game, user, game_mode, rank):
+        leaderboard_item = self.create(
+            user = user,
+            game_mode = game_mode,
+            rank = rank,
+            date = timezone.now().date(),
+            game = game
+        )
+        return leaderboard_item
+
+
+class Leaderboard(models.Model):
+    rank = models.IntegerField()
+    game_mode = game_mode = models.CharField( 
+        max_length = 6,
+        choices = 
+        {
+            "easy": "Easy Game Mode",
+            "medium": "Medium Game Mode",
+            "hard": "Hard Game Mode",
+            "daily": "Daily Numble",
+            "ubest": "User's Best Game"
+        },
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    game = models.ForeignKey(
+        Game,
+        on_delete=models.CASCADE,
+    )
+    date = models.DateField()
+
+    objects = LeaderboardManager()
