@@ -19,31 +19,35 @@
     </div>
 
     <br>
-    
+
     <div class="d-flex align-items-center justify-content-center flex-column">
         {% if not is_list_empty %}
-        {% for leaderboard_game in top_games %}
-        <div>
-            <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Username">{{ leaderboard_game.user.username }} </span>
-            <span class="half-btn blue no-bg-color
-                        {% if leaderboard_game.rank == 1 %}yellow{% endif %}
-                        {% if leaderboard_game.rank == 2 %}orange{% endif %}
-                        {% if leaderboard_game.rank == 3 %}red{% endif %}
-                        " data-bs-toggle="tooltip" data-bs-placement="top" 
-                        title="Game Result">{{ leaderboard_game.rank }}{% if leaderboard_game.rank == 1 %} 🏆{% endif %}</span>
-            <span class="half-btn blue
-                        {% if leaderboard_game.game.game_mode == 'easy' %}green{% endif %}
-                        {% if leaderboard_game.game.game_mode == 'medium' %}orange{% endif %}
-                        {% if leaderboard_game.game.game_mode == 'hard' %}red{% endif %}
-                        no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Game Mode">{{ leaderboard_game.game.game_mode }}</span>
-            <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Number of Tries">{{ leaderboard_game.game.number_of_tries }} 🎯</span>
-            <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Game Duration">{{ leaderboard_game.game.duration|convert_to_readable_time}} ⏲️</span>
-            <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ game.date }} {{ game.start_time }}">🗓️ {{ leaderboard_game.game.date }}</span>
-            <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="game id">{{ leaderboard_game.game.pk }}</span>
-            </ul>
-        </div>
-        <br>
-        {% endfor %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"># Rank</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Number of Tries</th>
+                    <th scope="col">Game Duration</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Time</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leaderboard_game in top_games %}
+                <tr>
+                    <th scope="row">{{ leaderboard_game.rank }}{% if leaderboard_game.rank == 1 %} 🥇{% endif %}{% if leaderboard_game.rank == 2 %} 🥈{% endif %}{% if leaderboard_game.rank == 3 %} 🥉{% endif %}</th>
+                    <td>{{ leaderboard_game.user.username }}</td>
+                    <td>{{ leaderboard_game.game.number_of_tries }}</td>
+                    <td>{{ leaderboard_game.game.duration|convert_to_readable_time}}</td>
+                    <td>{{ leaderboard_game.game.date }}</td>
+                    <td>{{ leaderboard_game.game.start_time }}</td>
+                    <td><a href="{% url 'play:game_by_id_view' game_mode=leaderboard_game.game.game_mode game_id=leaderboard_game.game.pk %}" class="btn btn-primary btn-sm">View Game</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         {% else %}
         <br>
         <h5 style="text-align: center;">There are no games to be displayed</h5>
@@ -52,11 +56,11 @@
 </div>
 
 <script>
-function redirect(selectObj) {
-    let idx = selectObj.selectedIndex; 
-    let which = selectObj.options[idx].value; 
-    location.replace(`{% url 'play:leaderboard_view' %}?game_mode=${which}`)
-}
+    function redirect(selectObj) {
+        let idx = selectObj.selectedIndex;
+        let which = selectObj.options[idx].value;
+        location.replace(`{% url 'play:leaderboard_view' %}?game_mode=${which}`)
+    }
 </script>
 
 {% endblock %}

@@ -14,7 +14,7 @@ urlpatterns = [
     # --- User paths ---
 
     # path("user/", views.user, name="user"), 
-    re_path(r"^user/(?P<username>[a-zA-Z\.\_]*)/$", views.user_profile, name="user_profile"),
+    re_path(r"^user/(?P<username>[a-zA-Z0-9\.\_]*)/$", views.user_profile, name="user_profile"),
 
     path("switch_theme/", views.switch_theme_view, name="switch_theme_view"),
 

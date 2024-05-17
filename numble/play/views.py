@@ -75,7 +75,7 @@ def is_valid_email(email):
     
 
 def is_valid_username(username):
-    regex = r'\b[a-zA-Z\.\_]*\b'
+    regex = r'\b[a-zA-Z0-9\.\_]*\b'
     if(re.fullmatch(regex, username)):
         return True
     else:
@@ -344,6 +344,9 @@ def game_by_id_view(request, game_mode, game_id):
 
 def add_game_to_leaderboard_if_deserved(game: Game, user: User, game_mode: str):
 
+    if game_mode == 'daily':
+        return
+
     top_games = Leaderboard.objects.filter(game_mode=game_mode)
     is_on_leaderboard = False
 
@@ -355,34 +358,45 @@ def add_game_to_leaderboard_if_deserved(game: Game, user: User, game_mode: str):
 
     last_leaderboard_game = None
     already_created = False
-    
 
-    # TODO: shift in the right place
-
-    for leaderboard_game in top_games:
-
-        if is_on_leaderboard:
+    for i, leaderboard_game in enumerate(top_games):
+        
+        if already_created:
             leaderboard_game.rank = F("rank") + 1
             leaderboard_game.save()
             continue
 
-        if game.number_of_tries <= leaderboard_game.game.number_of_tries:
-            if game.duration < leaderboard_game.game.duration:
-                Leaderboard.objects.create_leaderboard_item(game, user, game_mode, leaderboard_game.rank)
-                last_leaderboard_game = leaderboard_game
-                is_on_leaderboard = True
+        if game.number_of_tries < leaderboard_game.game.number_of_tries:
+            Leaderboard.objects.create_leaderboard_item(game, user, game_mode, leaderboard_game.rank)
+            leaderboard_game.rank = F("rank") + 1
+            leaderboard_game.save()
+            already_created = True
+            continue
+
+        if game.number_of_tries == leaderboard_game.game.number_of_tries and game.duration < leaderboard_game.game.duration:
+            Leaderboard.objects.create_leaderboard_item(game, user, game_mode, leaderboard_game.rank)
+            leaderboard_game.rank = F("rank") + 1
+            leaderboard_game.save()
+            already_created = True
+            continue
+
+        try:
+            top_games[i+1]
+            if game.number_of_tries < top_games[i+1].game.number_of_tries:
+                Leaderboard.objects.create_leaderboard_item(game, user, game_mode, leaderboard_game.rank + 1)
                 already_created = True
+                continue
 
-                leaderboard_game.rank = F("rank") + 1
-                leaderboard_game.save()
-
+            if game.number_of_tries == top_games[i+1].game.number_of_tries and game.duration < top_games[i+1].game.duration:
+                Leaderboard.objects.create_leaderboard_item(game, user, game_mode, leaderboard_game.rank + 1)
+                already_created = True
+                continue
+        
+        except IndexError:
+            pass
+    
     if len(top_games) < 20 and not already_created:
         Leaderboard.objects.create_leaderboard_item(game, user, game_mode, len(top_games) + 1)
-        return
-    
-    if is_on_leaderboard and len(top_games) > 20:
-        last_leaderboard_game.delete()
-                    
 
 
 # @login_required(login_url='/login/')
@@ -467,7 +481,6 @@ def user_profile(request, username):
     games_lost = total_games - games_won
 
     is_history_empty = len(game_history) == 0
-    print(is_history_empty)
 
     player_stats = {
         "games_played": total_games,
@@ -490,20 +503,15 @@ def user_profile(request, username):
     )
 
 def leaderboard_view(request):
-    """
-    TODO: create a tabel for top 20 games + a tabel for top user game (his best game for each mode)
-          these tabels should be updated when the game is complete and won
-
-          leaderboard view should only read and display this table
-          profile view should read the top user game table and add them as stats
-
-          implement a today's leaderboard
-    """
 
     template_name = "play/leaderboard.html"
 
+    Leaderboard_game_modes = game_modes[:]
+    Leaderboard_game_modes.remove('daily')
+    Leaderboard_game_modes.remove('1v1')
+
     request_game_mode = request.GET.get('game_mode')
-    if request_game_mode in game_modes:
+    if request_game_mode in Leaderboard_game_modes:
         top_games = Leaderboard.objects.filter(game_mode=request_game_mode)
     else:
         top_games = Leaderboard.objects.filter(game_mode='easy')
@@ -511,9 +519,7 @@ def leaderboard_view(request):
 
     top_games = sorted(list(top_games), key=lambda x: x.rank, reverse=False)
 
-    other_modes = game_modes[:]
-    other_modes.remove('1v1')
-    other_modes.remove(request_game_mode)
+    Leaderboard_game_modes.remove(request_game_mode)
 
     is_list_empty = len(top_games) == 0
     
@@ -522,8 +528,8 @@ def leaderboard_view(request):
             template_name,
             {
                 "is_list_empty": is_list_empty,
-                "top_games" : top_games,
+                "top_games": top_games,
                 "game_mode": request_game_mode,
-                "other_modes": other_modes,
+                "other_modes": Leaderboard_game_modes,
             }
            )
