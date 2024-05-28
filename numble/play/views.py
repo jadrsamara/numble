@@ -89,7 +89,7 @@ def signup_done_view(request):
 
     def validate(request):
 
-        if len(request.POST["email"]) > 20 or len(request.POST["username"]) > 20:
+        if len(request.POST["email"]) > 50 or len(request.POST["username"]) > 20:
             return render(
                 request,
                 sign_up_template,

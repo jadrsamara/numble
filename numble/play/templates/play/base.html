@@ -70,6 +70,10 @@
     <main role="main" class="justify-content-center">
         {% block content %}
         {% endblock %}
+
+        <div id="loading_container" class="loading_container" style="display: none;">
+            <div class="loading"></div>
+        </div>
     </main>
 
     <footer class="footer fixed-bottom d-flex p-2 justify-content-center header-bg">
@@ -91,5 +95,44 @@
         </form>
     </footer>
 </body>
+
+<script>
+    animateDisplay = function(target, animationClass, displayType, timeout) {
+        var doneTimedDisplay = false,
+        displaying = false;
+
+        target.addEventListener('transitionend', function() {
+            if (!target.classList.contains('show')) {
+                target.style.display = 'none';
+            }
+            doneTimedDisplay = true;
+        });
+        if (!target.style.display || target.style.display === 'none') {
+            displaying = true;
+            target.style.display = displayType;
+        } else {
+            displaying = false;
+        }
+
+        window.requestAnimationFrame(function() {
+        target.classList.toggle(animationClass);
+        doneTimedDisplay = false;     
+        });
+
+        if (!displaying) {
+        setTimeout(function() {
+            // failsafe for transitioned not firing
+            if (!doneTimedDisplay) {
+            target.style.display = 'none';
+            }
+            doneTimedDisplay = true;
+        }, timeout);
+        }
+    };
+    navigation.addEventListener('navigate', () => {
+        // document.getElementById("loading_container").style.display = "inline-block";
+        animateDisplay(document.querySelector('.loading_container'), 'show', 'block', 500)
+    });
+</script>
 
 </html>
