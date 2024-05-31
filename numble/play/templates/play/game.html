@@ -29,8 +29,7 @@
     {% for i in game_tries_range %}
     <div class="numbers-row">
         {% for j in game_mode_range %}
-        <input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1"
-            value="{% get_value_2d game_tries i j %}" class="btn_ {% get_color game i j %} row-item" disabled>
+        <button type="number" class="btn_ {% get_color game i j %} row-item center-logo">{% get_value_2d game_tries i j %}</button>
         {% endfor %}
     </div>
     {% endfor %}
