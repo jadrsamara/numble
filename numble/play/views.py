@@ -361,7 +361,6 @@ def add_game_to_leaderboard_if_deserved(game: Game, user: User, game_mode: str):
         return
 
     top_games = Leaderboard.objects.filter(game_mode=game_mode)
-    is_on_leaderboard = False
 
     top_games = sorted(list(top_games), key=lambda x: x.rank, reverse=False)
 
@@ -369,10 +368,13 @@ def add_game_to_leaderboard_if_deserved(game: Game, user: User, game_mode: str):
         Leaderboard.objects.create_leaderboard_item(game, user, game_mode, 1)
         return
 
-    last_leaderboard_game = None
     already_created = False
 
     for i, leaderboard_game in enumerate(top_games):
+
+        if already_created and len(top_games) > 20 and i >= 20:
+            leaderboard_game.delete()
+            continue
         
         if already_created:
             leaderboard_game.rank = F("rank") + 1
@@ -411,6 +413,29 @@ def add_game_to_leaderboard_if_deserved(game: Game, user: User, game_mode: str):
     if len(top_games) < 20 and not already_created:
         Leaderboard.objects.create_leaderboard_item(game, user, game_mode, len(top_games) + 1)
 
+
+@require_http_methods(["POST"])
+def game_forfeit_view(request, game_mode, game_id):
+    
+    user = get_user_from_request(request)
+    game = Game.objects.filter(pk=game_id, user=user, game_mode=game_mode).first()
+    
+    if game == None:
+        return HttpResponseNotFound()
+    
+    if game.game_completed:
+        return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+    
+    expire_time = datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc)
+    game.game_completed = True
+    game.finish_time = timezone.now()
+    game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.expire_time, tzinfo=datetime.timezone.utc)
+    game.game_won = False
+
+    game.save()
+
+    return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+    
 
 # @login_required(login_url='/login/')
 @require_http_methods(["POST"])

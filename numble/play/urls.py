@@ -42,6 +42,7 @@ urlpatterns = [
     path("games/<slug:game_mode>/", views.game_view, name="game_view"),
     path("games/<slug:game_mode>/<int:game_id>/", views.game_by_id_view, name="game_by_id_view"),
     path("games/<slug:game_mode>/<int:game_id>/submit/", views.game_submit_view, name="game_submit_view"),
+    path("games/<slug:game_mode>/<int:game_id>/forfeit/", views.game_forfeit_view, name="game_forfeit_view"),
 
     path("leaderboard/", views.leaderboard_view, name="leaderboard_view"),
 ]
