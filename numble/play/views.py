@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db.models import F
 
+import os
 import random as random
 import datetime
 import random as random_with_seed
@@ -248,7 +249,16 @@ def get_a_new_game_number(game_mode):
 
 def get_user_from_request(request) -> User:
     if request.user.is_anonymous:
-        return User.objects.get(username='Anonymous')
+        try:
+            return User.objects.get(username='Anonymous')
+        except User.DoesNotExist:
+            return User.objects.create_user(
+                username='Anonymous',
+                email='anon@anon',
+                password=os.environ['AnonUserPass'],
+                first_name='',
+                last_name='',
+            )
     else:
         return request.user
 
@@ -345,6 +355,9 @@ def game_by_id_view(request, game_mode, game_id):
 def add_game_to_leaderboard_if_deserved(game: Game, user: User, game_mode: str):
 
     if game_mode == 'daily':
+        return
+    
+    if user.username == 'Anonymous':
         return
 
     top_games = Leaderboard.objects.filter(game_mode=game_mode)
