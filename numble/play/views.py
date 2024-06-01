@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseServerError
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db.models import F
 
@@ -15,7 +15,7 @@ import random as random_with_seed
 import re
 
 from .models import Game, Leaderboard
-from .templatetags.custom_template_tags import convert_to_readable_time
+# from .templatetags.custom_template_tags import convert_to_readable_time
 
 
 base_template = "play/index.html"
@@ -34,6 +34,9 @@ def index(request):
         request,
         base_template,
     )
+
+def health_check(request):
+    return HttpResponse("success")
 
 
 def switch_theme_view(request):
