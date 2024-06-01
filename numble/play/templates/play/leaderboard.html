@@ -20,7 +20,7 @@
 
     <br>
 
-    <div class="d-flex align-items-center justify-content-center flex-column">
+    <div class="d-flex flex-column" style="overflow-x:auto;">
         {% if not is_list_empty %}
         <table class="table">
             <thead>
@@ -29,8 +29,8 @@
                     <th scope="col">Username</th>
                     <th scope="col">Number of Tries</th>
                     <th scope="col">Game Duration</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Time</th>
+                    <th scope="col" style="min-width: 150px;">Date</th>
+                    <th scope="col" style="min-width: 100px;">Time</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
