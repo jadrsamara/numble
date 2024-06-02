@@ -1,5 +1,5 @@
 # Numble
-Is a numbers game called Numble (similar to Wordle) where you try to guess a number using simple visual ques
+Is a numbers game called Numble (similar to Wordle) where you try to guess a number using simple visual cues
 
 Bellow is a sample game, trys were as follows:
 - 0123: first try has all the numbers shown in gray meaning they are all not part of the number to be guessed
