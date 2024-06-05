@@ -368,20 +368,17 @@ def game_won_options(game: Game, user: User, game_mode: str):
     if user.username == 'Anonymous':
         return
 
-    if game_mode == 'daily':
-
+    def user_game_streak():
         streak = Streak.objects.filter(user=user).first()
 
         if streak == None:
             streak = Streak.objects.create_streak(user=user)
-            print('create new streak obj')
             return
 
         if streak.date == timezone.now():
             streak.date = timezone.now() + timezone.timedelta(days=1)
             streak.streak = F("streak") + 1
             streak.save()
-            print('streak incremented')
             return
 
         if streak.date - timezone.timedelta(days=1) == timezone.now():
@@ -390,8 +387,9 @@ def game_won_options(game: Game, user: User, game_mode: str):
         streak.date = timezone.now() + timezone.timedelta(days=1)
         streak.streak = 1
         streak.save()
-        print('streak reset')
         return
+    
+    user_game_streak()
 
     top_games = Leaderboard.objects.filter(game_mode=game_mode)
 
