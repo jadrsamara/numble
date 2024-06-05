@@ -188,3 +188,41 @@ li {
     transform: rotate(360deg);
   }
 }
+
+/* footer */
+
+.select-theme-from{
+  margin-right: 10px;
+}
+
+.form-select{
+  margin-top: 10px;
+}
+
+.user_stats{
+  margin-top: 5px;
+  margin-left: 10px;
+}
+
+@media only screen and (max-width: 576px) {
+
+  .user_stats:hover .user_stats_hidden_content{
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .user_stats_hidden_content{
+    transition: all 0.5s ease;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+}
+
+@media only screen and (max-height: 720px) {
+
+  .hide-if-screen-too-small{
+    display: none;
+  }
+
+}

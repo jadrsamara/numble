@@ -83,18 +83,29 @@
         </div>
     </main>
 
-    <footer class="footer fixed-bottom d-flex p-2 justify-content-center header-bg">
-        <form class="text-muted" action="{% url 'play:switch_theme_view' %}" method="post">
+    <footer class="footer fixed-bottom d-flex p-1 justify-content-between header-bg">
+        <div class="user_stats">
+            {% if user.is_authenticated %}
+            {% get_user_stats user as user_stats %}
+            <span>🔥 {{user_stats.streak}}</span><span class="user_stats_hidden_content"> day streak</span>
+            <br>
+            <span>📅 {{user_stats.dailies}}</span><span class="user_stats_hidden_content"> dailies solved</span>
+            {% else %}
+            <span style="filter: grayscale(1);">🔥 0</span><span class="user_stats_hidden_content"> day streak</span>
+            <br>
+            <span style="filter: grayscale(1);">📅 0</span><span class="user_stats_hidden_content"> dailies solved</span>
+            {% endif %}
+        </div>
+        <form class="text-muted select-theme-from" action="{% url 'play:switch_theme_view' %}" method="post">
             {% csrf_token %}
             <div class="col-12">
-                <label class="" for="inlineFormSelectPref">Theme Preference</label>
                 <select class="form-select" id="inlineFormSelectPref" onchange="this.form.submit()">
                     {% get_theme request as theme %}
                     {% if theme == 'light' %}
-                    <option selected>Light</option>
+                    <option disabled selected>Theme</option>
                     <option name="theme" value="dark">Dark</option>
                     {% else %}
-                    <option selected>Dark</option>
+                    <option disabled selected>Theme</option>
                     <option name="theme" value="light">Light</option>
                     {% endif %}
                 </select>

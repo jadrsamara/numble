@@ -1,5 +1,6 @@
 from django import template
-from django.urls import reverse
+
+from .. models import Game, Streak
 
 register = template.Library()
 
@@ -40,6 +41,21 @@ def get_theme(request):
     except:
         return 'light'
     
+
+@register.simple_tag
+def get_user_stats(user):
+    streak = Streak.objects.filter(user=user).first()
+    if streak == None:
+        streak = 0
+    else:
+        streak = streak.streak
+
+    number_of_daily_games = Game.objects.filter(user=user, game_mode='daily', game_completed=True).count()
+    return {
+        "dailies": number_of_daily_games,
+        "streak": streak,
+    }
+
 
 def pretty_time_delta(seconds):
     seconds = int(seconds)

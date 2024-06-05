@@ -25,15 +25,19 @@
     <div>
         <h4>Can you guess the number?</h4>
     </div>
-    <br>
-    <br>
+    <div class="hide-if-screen-too-small">
+        <br>
+        <br>
+    </div>
     <div>
         <a href="{% url 'play:play_view' %}">
             <h1 class="btn_ yellow">Play Now!</h1>
         </a>
     </div>
-    <br>
-    <br>
+    <div class="hide-if-screen-too-small">
+        <br>
+        <br>
+    </div>
     {% if not user.is_authenticated %}
     <div>
         <h4>Sign up / Log in</h4>
@@ -47,7 +51,10 @@
     </div>
     {% else %}
     <br>
-    <br>
+    <div class="hide-if-screen-too-small">
+        <br>
+        <br>
+    </div>
     <div>
         <h3>Welcome</h3>
     </div>

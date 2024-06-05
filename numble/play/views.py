@@ -41,7 +41,7 @@ def health_check(request):
 
 
 def about_view(request):
-    return HttpResponse("made by Jad Samara")
+    return HttpResponse("made by Jad Samara\ncontact@numble.one")
 
 
 def switch_theme_view(request):
