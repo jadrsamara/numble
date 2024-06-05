@@ -11,6 +11,7 @@ urlpatterns = [
 
     path("", views.index, name="index"),
     path("health-check/", views.health_check, name="health_check"),
+    path("about/", views.about_view, name="about_view"),
 
     # --- User paths ---
 

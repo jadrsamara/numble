@@ -14,7 +14,7 @@ import datetime
 import random as random_with_seed
 import re
 
-from .models import Game, Leaderboard
+from .models import Game, Leaderboard, Streak
 # from .templatetags.custom_template_tags import convert_to_readable_time
 
 
@@ -35,8 +35,13 @@ def index(request):
         base_template,
     )
 
+
 def health_check(request):
     return HttpResponse("success")
+
+
+def about_view(request):
+    return HttpResponse("made by Jad Samara")
 
 
 def switch_theme_view(request):
@@ -283,6 +288,9 @@ def game_view(request, game_mode):
     else: 
         game = None
 
+    if game_mode == 'daily':
+        game = Game.objects.filter(user=user, date=timezone.now().date(), game_mode=game_mode).first()
+
     if game == None:
         game = Game.objects.create_game(
             user = user,
@@ -355,12 +363,34 @@ def game_by_id_view(request, game_mode, game_id):
     )
 
 
-def add_game_to_leaderboard_if_deserved(game: Game, user: User, game_mode: str):
-
-    if game_mode == 'daily':
-        return
+def game_won_options(game: Game, user: User, game_mode: str):
     
     if user.username == 'Anonymous':
+        return
+
+    if game_mode == 'daily':
+
+        streak = Streak.objects.filter(user=user).first()
+
+        if streak == None:
+            streak = Streak.objects.create_streak(user=user)
+            print('create new streak obj')
+            return
+
+        if streak.date == timezone.now():
+            streak.date = timezone.now() + timezone.timedelta(days=1)
+            streak.streak = F("streak") + 1
+            streak.save()
+            print('streak incremented')
+            return
+
+        if streak.date - timezone.timedelta(days=1) == timezone.now():
+            return
+        
+        streak.date = timezone.now() + timezone.timedelta(days=1)
+        streak.streak = 1
+        streak.save()
+        print('streak reset')
         return
 
     top_games = Leaderboard.objects.filter(game_mode=game_mode)
@@ -494,7 +524,7 @@ def game_submit_view(request, game_mode, game_id):
 
         if game.number == new_number_try:
             game.game_won = True
-            add_game_to_leaderboard_if_deserved(game, user, game_mode)
+            game_won_options(game, user, game_mode)
     
     game.save()
 
@@ -529,6 +559,14 @@ def user_profile(request, username):
         "games_lost": games_lost,
     }
 
+    streak = Streak.objects.filter(user=profile_user).first()
+    if streak == None:
+        streak = 0
+    else:
+        streak = streak.streak
+
+    number_of_daily_games = Game.objects.filter(user=profile_user, game_mode='daily', game_completed=True).count()
+
     return render(
         request,
         template_name,
@@ -540,6 +578,8 @@ def user_profile(request, username):
             "is_friend": 'Follow', # TODO
             "player_stats": player_stats,
             "is_history_empty": is_history_empty,
+            "streak": streak,
+            "daily_games": number_of_daily_games,
         },
     )
 

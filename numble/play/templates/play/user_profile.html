@@ -10,7 +10,7 @@
         <div class="card mb-3 border user_card">
             <div class="row no_card_flex_wrap">
                 <div class="col" style="text-align: right;">
-                    <span style="font-size: 300%; line-height: 300%;">{{ profile_initials }}</span>
+                    <span style="font-size: 220%; line-height: 400%;">{{ profile_initials }}</span>
                 </div>
                 <div class="col">
                     <div class="card-body">
@@ -30,8 +30,15 @@
         <div class="card text-center mb-3 border user_stats_card">
             <div class="card-body">
                 <br>
-                <h5 class="card-title">Total Games</h5>
-                <h2 class="card-text">{{ player_stats.games_played }}</h2>
+                <h5 class="card-title">Current Streak</h5>
+                <h2 class="card-text">{{ streak }}🔥</h2>
+            </div>
+        </div>
+        <div class="card text-center mb-3 border user_stats_card">
+            <div class="card-body">
+                <br>
+                <h5 class="card-title">Daily Games Solved</h5>
+                <h2 class="card-text">{{ daily_games }}</h2>
             </div>
         </div>
         <div class="card text-center mb-3 border user_stats_card">

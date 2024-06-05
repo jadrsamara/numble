@@ -84,3 +84,24 @@ class Leaderboard(models.Model):
     date = models.DateField()
 
     objects = LeaderboardManager()
+
+
+class StreakManager(models.Manager):
+    def create_streak(self, user):
+        streak = self.create(
+            user = user,
+            streak = 1,
+            date = (timezone.now() + timezone.timedelta(days=1)).date(),
+        )
+        return streak
+
+
+class Streak(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    date = models.DateField()
+    streak = models.IntegerField(default=0)
+
+    objects = StreakManager()
