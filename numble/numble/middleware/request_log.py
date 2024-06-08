@@ -20,6 +20,12 @@ class RequestLogMiddleware:
 
         # request passes on to controller
         response = self.get_response(request)
+
+        try:
+            response.status_code
+        except AttributeError:
+            response.status_code = 500
+            response.reason_phrase = 'Internal Server Error'
         
         log_data = {
             "remote_address": request.META.get("REMOTE_ADDR", ''),
@@ -51,25 +57,30 @@ class RequestLogMiddleware:
             if http_header.lower().startswith('http'):
                 log_data[http_header] = request.META.get(http_header)
 
+        log_data['logger.client.ip'] = request.META.get('HTTP_X_FORWARDED_FOR', '-, -').split(', ')[0]
+
         # Only logging "*/api/*" patterns
         if "/api/" in str(request.get_full_path()):
             req_body = json.loads(request.body.decode("utf-8")) if request.body else {}
             log_data["request_body"] = req_body
 
         # add runtime to our log_data
-        if response and response["content-type"] == "application/json":
-            response_body = json.loads(response.content.decode("utf-8"))
-            log_data["response_body"] = response_body
-        log_data["run_time"] = f'{time.monotonic() - start_time:.2f}s'
+        try:
+            if response and response["content-type"] == "application/json":
+                response_body = json.loads(response.content.decode("utf-8"))
+                log_data["response_body"] = response_body
+            log_data["run_time"] = f'{time.monotonic() - start_time:.2f}s'
+        except TypeError:
+            log_data["run_time"] = 'no response'
 
         request_logger.info(msg=log_data["request"]+'&'+json.dumps(log_data))
 
         return response
 
-    # Log unhandled exceptions as well
-    def process_exception(self, request, exception):
-        try:
-            raise exception
-        except Exception as e:
-            request_logger.exception("Unhandled Exception: " + str(e))
-        return exception
+    # # Log unhandled exceptions as well
+    # def process_exception(self, request, exception):
+    #     try:
+    #         raise exception
+    #     except Exception as e:
+    #         request_logger.exception("Unhandled Exception: " + str(e))
+    #     return exception

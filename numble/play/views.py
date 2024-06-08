@@ -235,7 +235,7 @@ def generate_numbers_by_seed(seed, number_of_digits):
     return numbers[:number_of_digits]
 
 
-def get_a_new_game_number(game_mode):
+def get_a_new_game_number(game_mode, request):
     number_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
     if game_mode == 'easy':
         game_number = random.sample(number_pool, 4)
@@ -246,8 +246,11 @@ def get_a_new_game_number(game_mode):
     if game_mode == 'hard':
         game_number = random.sample(number_pool, 6)
         return ''.join(str(num) for num in game_number)
-    if game_mode == 'daily':
+    if game_mode == 'daily' and request.user.is_anonymous:
         game_number = generate_numbers_by_seed(int(str((datetime.datetime.now(datetime.timezone.utc).date())).replace('-', '')), number_of_digits=4)
+        return ''.join(str(num) for num in game_number)
+    if game_mode == 'daily' and not request.user.is_anonymous:
+        game_number = random.sample(number_pool, 4)
         return ''.join(str(num) for num in game_number)
 
 
@@ -284,14 +287,14 @@ def game_view(request, game_mode):
     else: 
         game = None
 
-    if game_mode == 'daily':
+    if game_mode == 'daily' and not request.user.is_anonymous:
         game = Game.objects.filter(user=user, date=timezone.now().date(), game_mode=game_mode).first()
 
     if game == None:
         game = Game.objects.create_game(
             user = user,
             game_mode = game_mode, 
-            number = get_a_new_game_number(game_mode),
+            number = get_a_new_game_number(game_mode, request),
         )
 
     game_id = game.pk
@@ -350,8 +353,8 @@ def game_by_id_view(request, game_mode, game_id):
         {
             "game_tries": tries,
             "game_tries_range": range(len(tries)),
-            "game_mode_range": range(len(get_a_new_game_number(game_mode))),
-            "game_mode_len": len(get_a_new_game_number(game_mode)),
+            "game_mode_range": range(len(get_a_new_game_number(game_mode, request))),
+            "game_mode_len": len(get_a_new_game_number(game_mode, request)),
             "GAME_TRIES_LIMIT": GAME_TRIES_LIMIT,
             "can_current_request_user_play": can_current_request_user_play,
             "game": game,
@@ -515,7 +518,7 @@ def game_submit_view(request, game_mode, game_id):
 
     new_number_try = []
 
-    for i in range(len(get_a_new_game_number(game_mode))):
+    for i in range(len(get_a_new_game_number(game_mode, request))):
         cell = request.POST[f"input_cell{i}"]
         if not 2 > len(cell) > 0:
             return HttpResponseServerError()
@@ -606,10 +609,10 @@ def leaderboard_view(request):
     template_name = "play/leaderboard.html"
 
     Leaderboard_game_modes = game_modes[:]
-    Leaderboard_game_modes.remove('daily')
     Leaderboard_game_modes.remove('1v1')
 
     request_game_mode = request.GET.get('game_mode')
+
     if request_game_mode in Leaderboard_game_modes:
         top_games = Leaderboard.objects.filter(game_mode=request_game_mode)
     else:

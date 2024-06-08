@@ -27,23 +27,33 @@
                 <tr>
                     <th scope="col"># Rank</th>
                     <th scope="col">Username</th>
-                    <th scope="col">Number of Tries</th>
-                    <th scope="col">Game Duration</th>
+                    <th scope="col">Tries 🎯</th>
+                    <th scope="col">Duration ⏲️</th>
+                    <th scope="col">{% if game_mode == 'daily' %}Total Dailies Won{% else %}User Current Streak{% endif %}</th>
+                    <th scope="col">User Win/Lose %</th>
                     <th scope="col" style="min-width: 150px;">Date</th>
-                    <th scope="col" style="min-width: 100px;">Time</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
+                {% get_user_streaks top_games game_mode as user_streaks %}
                 {% for leaderboard_game in top_games %}
                 <tr>
+                    {% get_user_streak leaderboard_game.user user_streaks as latest_user_streak%}
                     <th scope="row">{{ leaderboard_game.rank }}{% if leaderboard_game.rank == 1 %} 🥇{% endif %}{% if leaderboard_game.rank == 2 %} 🥈{% endif %}{% if leaderboard_game.rank == 3 %} 🥉{% endif %}</th>
                     <td>{{ leaderboard_game.user.username }}</td>
                     <td>{{ leaderboard_game.game.number_of_tries }}</td>
                     <td>{{ leaderboard_game.game.duration|convert_to_readable_time}}</td>
-                    <td>{{ leaderboard_game.game.date }}</td>
-                    <td>{{ leaderboard_game.game.start_time }}</td>
-                    <td><a href="{% url 'play:game_by_id_view' game_mode=leaderboard_game.game.game_mode game_id=leaderboard_game.game.pk %}" class="btn btn-primary btn-sm">View Game</a></td>
+                    {% if game_mode == 'daily' %}
+                    <td>{% if latest_user_streak > 0 %}{{latest_user_streak}} 📅{% else %}-{% endif %}</td>
+                    {% else %}
+                    <td>{% if latest_user_streak > 0 %}{{latest_user_streak}} 🔥{% else %}-{% endif %}</td>
+                    {% endif %}
+                    <td>{% get_user_wl_ratio leaderboard_game.user user_streaks %}%</td>
+                    <td data-bs-toggle="tooltip" data-bs-placement="top" 
+                        title="{{ leaderboard_game.game.start_time }}">{{ leaderboard_game.game.date }}</td>
+                    <td><a href="{% url 'play:game_by_id_view' game_mode=leaderboard_game.game.game_mode game_id=leaderboard_game.game.pk %}" 
+                        class="btn btn-primary btn-sm">View Game</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -57,6 +57,45 @@ def get_user_stats(user):
     }
 
 
+@register.simple_tag
+def get_user_streaks(games, game_mode):
+
+    users_dict = dict()
+    users_wl_raation_dict = dict()
+
+    for game in games:
+        users_dict.update({game.user.pk: 0})
+
+    for user in users_dict:
+
+        if game_mode == 'daily':
+            dailies = Game.objects.filter(user=user, game_completed=True, game_mode='daily').count()
+            users_dict[user] = dailies
+        else:
+            streak = Streak.objects.filter(user=user).first()
+            if streak == None:
+                streak = 0
+            else:
+                streak = streak.streak
+            users_dict[user] = streak
+
+        total_games = Game.objects.filter(user=user, game_completed=True).count()
+        total_games_won = Game.objects.filter(user=user, game_completed=True, game_won=True).count()
+        users_wl_raation_dict[user] = f'{(total_games_won/total_games)*100:.2f}'.rstrip('0').rstrip('.')
+    
+    return (users_dict, users_wl_raation_dict)
+
+
+@register.simple_tag
+def get_user_streak(user, user_streaks):
+    return user_streaks[0][user.pk]
+
+
+@register.simple_tag
+def get_user_wl_ratio(user, user_streaks):
+    return user_streaks[1][user.pk]
+
+
 def pretty_time_delta(seconds):
     seconds = int(seconds)
     days, seconds = divmod(seconds, 86400)

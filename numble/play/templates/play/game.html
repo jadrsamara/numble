@@ -112,7 +112,7 @@
     {% if not game.game_completed and request.user == game.user %}
     <form action="{% url 'play:game_forfeit_view' game.game_mode game.pk %}" method="post">
         {% csrf_token %}
-        <div class="numbers-row"><input type="submit" class="btn_ red forfeit" value="forfeit game"></div>
+        <div class="numbers-row"><input type="submit" class="btn_ red" value="Forfeit Game"></div>
     </form>
     {% endif %}
     

@@ -8,17 +8,17 @@
 
         <h1>Select Game Mode:</h1>
         <div class="d-flex align-items-center justify-content-center flex-row menu">
-            <p><a class="btn_ green menu-item" href="{% url 'play:game_view' 'easy' %}">easy</a></p>
-            <p><a class="btn_ orange menu-item" href="{% url 'play:game_view' 'medium' %}">medium</a></p>
-            <p><a class="btn_ red menu-item" href="{% url 'play:game_view' 'hard' %}">hard</a></p>
-            <p><a class="btn_ blue menu-item" href="{% url 'play:game_view' 'daily' %}">daily</a></p>
+            <p><a class="btn_ green menu-item" href="{% url 'play:game_view' 'easy' %}">Easy</a></p>
+            <p><a class="btn_ orange menu-item" href="{% url 'play:game_view' 'medium' %}">Medium</a></p>
+            <p><a class="btn_ red menu-item" href="{% url 'play:game_view' 'hard' %}">Hard</a></p>
+            <p><a class="btn_ blue menu-item" href="{% url 'play:game_view' 'daily' %}">Daily</a></p>
         </div>
         
         <br>
         
-        <h2>Play with a friend</h2>
+        <!-- <h2>Play with a friend</h2>
         <p>( Needs to be signed in )</p>
-        <p><a class="btn_ blue menu-item" href="#">1v1</a></p>
+        <p><a class="btn_ blue menu-item" href="#">1v1</a></p> -->
 
         <br>
         <p>Don't know how to play? see <a href="{% url 'play:game_by_id_view' 'easy' 1 %}">How to play.</a>
