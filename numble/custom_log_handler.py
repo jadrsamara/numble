@@ -3,8 +3,15 @@ import logging
 import requests
 import json
 import gzip
+import threading
+import queue
+import newrelic.agent
 
 from io import BytesIO
+
+# Configuration for New Relic
+NEW_RELIC_API_KEY = os.environ['NEW_RELIC_API_KEY']
+NEW_RELIC_LOG_API_URL = os.environ['NEW_RELIC_LOG_API_URL']
 
 
 class NewRelicLogHandler(logging.Handler):
@@ -19,9 +26,10 @@ class NewRelicLogHandler(logging.Handler):
         msg_logger = log_entry.split('&')
         log_entry = msg_logger[0] 
         try:
-            logger = msg_logger[1]
+            logger = json.loads(msg_logger[1])
         except IndexError:
             logger = ''
+
         log_data = [{
             "application": os.environ["NEW_RELIC_APP_NAME"],
             "debug_mode": bool(os.environ.get("DEBUG", default=0)),
@@ -57,6 +65,3 @@ class NewRelicLogHandler(logging.Handler):
             print(f'Failed to send logs: {response.status_code}')
             print(response.text)
 
-# Configuration for New Relic
-NEW_RELIC_API_KEY = os.environ['NEW_RELIC_API_KEY']
-NEW_RELIC_LOG_API_URL = os.environ['NEW_RELIC_LOG_API_URL']

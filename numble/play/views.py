@@ -4,7 +4,6 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
-# from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db.models import F
 
@@ -12,16 +11,10 @@ import os
 import random as random
 import datetime
 import random as random_with_seed
+import logging
 import re
-import time
-import requests
-import json
-import gzip
-from io import BytesIO
-
 
 from .models import Game, Leaderboard, Streak
-# from .templatetags.custom_template_tags import convert_to_readable_time
 
 
 base_template = "play/index.html"
@@ -30,6 +23,8 @@ base_reverse = "play:index"
 GAME_TRIES_LIMIT = 7
 game_modes = ['easy', 'medium', 'hard', 'daily', '1v1']
 
+
+request_logger = logging.getLogger("django")
 
 
 # --- Home ---
@@ -40,11 +35,6 @@ def index(request):
         request,
         base_template,
     )
-
-
-def health_check(request):
-    return HttpResponse("success")
-
 
 def about_view(request):
     return HttpResponse("made by Jad Samara\ncontact@numble.one")
@@ -379,17 +369,41 @@ def game_won_options(game: Game, user: User, game_mode: str):
 
         if streak == None:
             streak = Streak.objects.create_streak(user=user)
+            request_logger.info('player has no streak '+str({
+                "user": str(user),
+                "streak": streak.streak,
+                "streak.date": str(streak.date),
+                "current date": str(timezone.now().date())
+            }))
             return
 
-        if streak.date == timezone.now():
-            streak.date = timezone.now() + timezone.timedelta(days=1)
+        if streak.date == timezone.now().date():
+            request_logger.info('player has extended their streak '+str({
+                "user": str(user),
+                "streak": streak.streak,
+                "streak.date": str(streak.date),
+                "current date": str(timezone.now().date())
+            }))
+            streak.date = timezone.now().date() + timezone.timedelta(days=1)
             streak.streak = F("streak") + 1
             streak.save()
             return
 
-        if streak.date - timezone.timedelta(days=1) == timezone.now():
+        if streak.date - timezone.timedelta(days=1) >= timezone.now().date():
+            request_logger.info('no action, player already has a streak for today '+str({
+                "user": str(user),
+                "streak": streak.streak,
+                "streak.date": str(streak.date),
+                "current date": str(timezone.now().date())
+            }))
             return
         
+        request_logger.info('reset streak to 1 '+str({
+            "user": str(user),
+            "streak": streak.streak,
+            "streak.date": str(streak.date),
+            "current date": str(timezone.now())
+        }))
         streak.date = timezone.now() + timezone.timedelta(days=1)
         streak.streak = 1
         streak.save()
@@ -618,6 +632,3 @@ def leaderboard_view(request):
                 "other_modes": Leaderboard_game_modes,
             }
            )
-
-def test_view(request):
-    return 'hi'

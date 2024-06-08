@@ -178,19 +178,13 @@ LOGGING = {
         'new_relic': {
             'level': 'DEBUG',
             'class': 'custom_log_handler.NewRelicLogHandler',
-            'formatter': 'verbose',
+            'formatter': 'simple',
             'api_key': os.environ['NEW_RELIC_API_KEY'],
             'log_api_url': os.environ['NEW_RELIC_LOG_API_URL'],
         }
     },
     "loggers": {
         "django": {
-            "handlers": ["console", "new_relic"],
-        },
-        "django.request": {
-            "handlers": ["console", "new_relic"],
-        },
-        "myproject.custom": {
             "handlers": ["console", "new_relic"],
         },
     },

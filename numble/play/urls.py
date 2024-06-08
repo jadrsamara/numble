@@ -10,10 +10,7 @@ urlpatterns = [
     # --- Home ---
 
     path("", views.index, name="index"),
-    path("health-check/", views.health_check, name="health_check"),
     path("about/", views.about_view, name="about_view"),
-
-    path("test/", views.test_view, name="test_view"),
 
     # --- User paths ---
 
