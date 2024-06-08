@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
+from custom_log_handler import NewRelicLogHandler
 import oracledb
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -47,6 +48,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "numble.middleware.request_log.RequestLogMiddleware",
 ]
 
 ROOT_URLCONF = "numble.urls"
@@ -149,7 +151,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "format": "{levelname} {asctime} {module} {message}",
             "style": "{",
         },
         "simple": {
@@ -168,21 +170,28 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
-        # "file": {
-        #     "class": "logging.FileHandler",
-        #     "formatter": "simple",
-        #     "filename": BASE_DIR / "logging/",
-        # },
+        "file": {
+            "class": "logging.FileHandler",
+            "formatter": "simple",
+            "filename": BASE_DIR / "logging/",
+        },
+        'new_relic': {
+            'level': 'DEBUG',
+            'class': 'custom_log_handler.NewRelicLogHandler',
+            'formatter': 'verbose',
+            'api_key': os.environ['NEW_RELIC_API_KEY'],
+            'log_api_url': os.environ['NEW_RELIC_LOG_API_URL'],
+        }
     },
     "loggers": {
         "django": {
-            "handlers": ["console"],
+            "handlers": ["console", "new_relic"],
         },
         "django.request": {
-            "handlers": ["console"],
+            "handlers": ["console", "new_relic"],
         },
         "myproject.custom": {
-            "handlers": ["console"],
+            "handlers": ["console", "new_relic"],
         },
     },
 }

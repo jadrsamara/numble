@@ -13,6 +13,12 @@ import random as random
 import datetime
 import random as random_with_seed
 import re
+import time
+import requests
+import json
+import gzip
+from io import BytesIO
+
 
 from .models import Game, Leaderboard, Streak
 # from .templatetags.custom_template_tags import convert_to_readable_time
@@ -612,3 +618,6 @@ def leaderboard_view(request):
                 "other_modes": Leaderboard_game_modes,
             }
            )
+
+def test_view(request):
+    return 'hi'
