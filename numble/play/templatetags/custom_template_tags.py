@@ -14,6 +14,27 @@ def get_value_2d(l, i, j):
     
 
 @register.simple_tag
+def get_blind(game, i):
+    try:
+        correct = 0
+        partial = 0
+        for i, try_number in enumerate(game.tries[f"try{i+1}"]):
+            if try_number == game.number[i]:
+                correct += 1
+            elif try_number in game.number:
+                partial += 1
+        return {
+            "correct": correct,
+            "partial": partial,
+        }
+    except:
+        return {
+            "correct": 0,
+            "partial": 0,
+        }
+    
+
+@register.simple_tag
 def get_color(game, i, j):
     try:
         i += 1
@@ -32,6 +53,11 @@ def get_value_1d(l, i):
         return l[i]
     except:
         return None
+    
+    
+@register.simple_tag
+def increment(i):
+    return i+1
     
 
 @register.simple_tag

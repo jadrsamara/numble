@@ -20,8 +20,16 @@ from .models import Game, Leaderboard, Streak
 base_template = "play/index.html"
 base_reverse = "play:index"
 
-GAME_TRIES_LIMIT = 7
-game_modes = ['easy', 'medium', 'hard', 'daily', '1v1']
+GAME_TRIES_LIMIT = {
+    'easy': 7, 
+    'medium': 7, 
+    'hard': 7, 
+    'daily': 7, 
+    'blind': 12, 
+    '1v1': 7,
+}
+GAME_TIMEOUT = 15
+game_modes = ['easy', 'medium', 'hard', 'daily', 'blind', '1v1']
 
 
 request_logger = logging.getLogger("django")
@@ -237,7 +245,7 @@ def generate_numbers_by_seed(seed, number_of_digits):
 
 def get_a_new_game_number(game_mode, request):
     number_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
-    if game_mode == 'easy':
+    if game_mode in ['easy', 'blind']:
         game_number = random.sample(number_pool, 4)
         return ''.join(str(num) for num in game_number)
     if game_mode == 'medium':
@@ -295,6 +303,7 @@ def game_view(request, game_mode):
             user = user,
             game_mode = game_mode, 
             number = get_a_new_game_number(game_mode, request),
+            expire_duration = GAME_TIMEOUT,
         )
 
     game_id = game.pk
@@ -305,7 +314,7 @@ def game_view(request, game_mode):
         expire_time = game.expire_time
 
     expire_time = datetime.datetime.combine(date=game.expire_date, time=expire_time, tzinfo=datetime.timezone.utc)
-    if expire_time < timezone.now():
+    if expire_time < timezone.now() and not game.game_completed:
         game.game_completed = True
         game.finish_time = timezone.now()
         game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.start_time, tzinfo=datetime.timezone.utc)
@@ -339,13 +348,16 @@ def game_by_id_view(request, game_mode, game_id):
         game.save()
     
     tries = []
-    for i in range(1, GAME_TRIES_LIMIT + 1):
+    for i in range(1, GAME_TRIES_LIMIT[game_mode] + 1):
         game_try = game.tries.get(f"try{i}")
         if game_try is None:
             break
         tries.append(game_try)
 
-    template_name = "play/game.html"
+    if game_mode == 'blind':
+        template_name = "play/game_blind.html"
+    else:
+        template_name = "play/game.html"
 
     return render(
         request,
@@ -353,9 +365,10 @@ def game_by_id_view(request, game_mode, game_id):
         {
             "game_tries": tries,
             "game_tries_range": range(len(tries)),
+            "game_last_try": tries[-1],
             "game_mode_range": range(len(get_a_new_game_number(game_mode, request))),
             "game_mode_len": len(get_a_new_game_number(game_mode, request)),
-            "GAME_TRIES_LIMIT": GAME_TRIES_LIMIT,
+            "GAME_TRIES_LIMIT": GAME_TRIES_LIMIT[game_mode],
             "can_current_request_user_play": can_current_request_user_play,
             "game": game,
         },
@@ -535,7 +548,7 @@ def game_submit_view(request, game_mode, game_id):
     tries[f"try{number_of_tries}"] = new_number_try
     game.tries = tries
 
-    if number_of_tries >= GAME_TRIES_LIMIT or game.number == new_number_try:
+    if number_of_tries >= GAME_TRIES_LIMIT[game_mode] or game.number == new_number_try:
         game.game_completed = True
         game.finish_time = timezone.now()
 

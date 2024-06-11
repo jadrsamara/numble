@@ -47,6 +47,10 @@
     box-shadow: 0px 5px 0px 0px #15B358;
 }
 
+.green-text {
+    color: #2ecc71;
+}
+
 .green:hover {
     background-color: #48E68B;
 }
@@ -54,6 +58,10 @@
 .orange {
     background-color: #e67e22;
     box-shadow: 0px 5px 0px 0px #CD6509;
+}
+
+.orange-text {
+    color: #e67e22;
 }
 
 .orange:hover {
@@ -155,12 +163,36 @@
     text-align: center;
 }
 
-
 .menu-item {
     padding: 12px;
     margin: 10px;
 }
 
+.vertical-line {
+    border-left: 6px solid gray;
+    margin: 8px;
+    border-radius: 5px;
+    box-shadow: 0px 5px 0px 0px gray;
+}
+
+.green-border {
+    border-color: #2ecc71;
+    box-shadow: 0px 5px 0px 0px #15B358;
+}
+
+.orange-border {
+    border-color: #e67e22;
+    box-shadow: 0px 5px 0px 0px #CD6509;
+}
+
+.try-result-text {
+    width: 80px;
+    min-width: 80px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    align-items: center;
+}
 
 @media only screen and (max-width: 600px) {
 

@@ -5,15 +5,15 @@ from django.utils import timezone
 
 
 class GameManager(models.Manager):
-    def create_game(self, user, game_mode, number):
+    def create_game(self, user, game_mode, number, expire_duration):
         game = self.create(
             user = user,
             game_mode = game_mode,
             number = number,
             date = timezone.now().date(),
             start_time = timezone.now(),
-            expire_time = timezone.now() + timezone.timedelta(minutes=5),
-            expire_date = (timezone.now() + timezone.timedelta(minutes=5)).date(),
+            expire_time = timezone.now() + timezone.timedelta(minutes=expire_duration),
+            expire_date = (timezone.now() + timezone.timedelta(minutes=expire_duration)).date(),
         )
         return game
 
@@ -38,6 +38,8 @@ class Game(models.Model):
             "medium": "Medium Game Mode",
             "hard": "Hard Game Mode",
             "daily": "Daily Numble",
+            "blind": "Blind Game Mode",
+            "2d": "2 Dimensional Game Mode"
         },
     )
     game_completed = models.BooleanField(default=False)

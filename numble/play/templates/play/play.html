@@ -6,11 +6,16 @@
 
         <br><br>
 
-        <h1>Select Game Mode:</h1>
+        <h1>Select Game Mode</h1>
+        <h2>Normal game modes:</h2>
         <div class="d-flex align-items-center justify-content-center flex-row menu">
             <p><a class="btn_ green menu-item" href="{% url 'play:game_view' 'easy' %}">Easy</a></p>
             <p><a class="btn_ orange menu-item" href="{% url 'play:game_view' 'medium' %}">Medium</a></p>
             <p><a class="btn_ red menu-item" href="{% url 'play:game_view' 'hard' %}">Hard</a></p>
+        </div>
+        <h2>Other game modes:</h2>
+        <div class="d-flex align-items-center justify-content-center flex-row menu">
+            <p><a class="btn_ yellow menu-item" href="{% url 'play:game_view' 'blind' %}">Blind</a></p>
             <p><a class="btn_ blue menu-item" href="{% url 'play:game_view' 'daily' %}">Daily</a></p>
         </div>
         
