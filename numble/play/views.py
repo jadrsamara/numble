@@ -348,11 +348,13 @@ def game_by_id_view(request, game_mode, game_id):
         game.save()
     
     tries = []
+    last_try = '0000'
     for i in range(1, GAME_TRIES_LIMIT[game_mode] + 1):
         game_try = game.tries.get(f"try{i}")
         if game_try is None:
             break
         tries.append(game_try)
+        last_try = game_try
 
     if game_mode == 'blind':
         template_name = "play/game_blind.html"
@@ -365,7 +367,7 @@ def game_by_id_view(request, game_mode, game_id):
         {
             "game_tries": tries,
             "game_tries_range": range(len(tries)),
-            "game_last_try": tries[-1],
+            "game_last_try": last_try,
             "game_mode_range": range(len(get_a_new_game_number(game_mode, request))),
             "game_mode_len": len(get_a_new_game_number(game_mode, request)),
             "GAME_TRIES_LIMIT": GAME_TRIES_LIMIT[game_mode],
