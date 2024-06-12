@@ -318,6 +318,7 @@ def game_view(request, game_mode):
         game.game_completed = True
         game.finish_time = timezone.now()
         game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.start_time, tzinfo=datetime.timezone.utc)
+        game.lose_reason = 'Timed out'
         game.game_won = False
     
         game.save()
@@ -339,11 +340,12 @@ def game_by_id_view(request, game_mode, game_id):
     can_current_request_user_play = not game.game_completed and ((game.user == request.user) or ((game.user.username == 'Anonymous') and (request.user.is_anonymous)))
     
     expire_time = datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc)
-    if not game.game_completed and (datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc) < timezone.now()):
+    if not game.game_completed and (expire_time < timezone.now()):
         game.game_completed = True
         game.finish_time = timezone.now()
         game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.start_time, tzinfo=datetime.timezone.utc)
         game.game_won = False
+        game.lose_reason = 'Timed out'
         can_current_request_user_play = False
         game.save()
     
@@ -499,6 +501,7 @@ def game_forfeit_view(request, game_mode, game_id):
     game.game_completed = True
     game.finish_time = timezone.now()
     game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.expire_time, tzinfo=datetime.timezone.utc)
+    game.lose_reason = 'Game forfeited'
     game.game_won = False
 
     game.save()
@@ -521,10 +524,11 @@ def game_submit_view(request, game_mode, game_id):
         return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
     
     expire_time = datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc)
-    if datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc) < timezone.now():
+    if expire_time < timezone.now():
         game.game_completed = True
         game.finish_time = timezone.now()
         game.duration = expire_time - datetime.datetime.combine(date=game.date, time=game.expire_time, tzinfo=datetime.timezone.utc)
+        game.lose_reason = 'Timed out'
         game.game_won = False
     
         game.save()
@@ -561,6 +565,8 @@ def game_submit_view(request, game_mode, game_id):
         if game.number == new_number_try:
             game.game_won = True
             game_won_options(game, user, game_mode)
+        else:
+            game.lose_reason = 'No more tries left'
     
     game.save()
 

@@ -46,6 +46,7 @@ class Game(models.Model):
     number = models.CharField(max_length=10)
     tries = models.JSONField(default=dict)
     game_won = models.BooleanField(default=False)
+    lose_reason = models.CharField(null=True, max_length=256)
 
     objects = GameManager()
 

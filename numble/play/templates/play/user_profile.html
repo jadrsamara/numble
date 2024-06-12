@@ -70,6 +70,9 @@
                 no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Game Mode">{{ game.game_mode }}</span>
                 <span class="half-btn blue no-bg-color
                 {% if game.game_won %}yellow{% else %}gray{% endif %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Game Result">{% if game.game_won %}Won 🏆{% else %}Loss ❌{% endif %}</span>
+                {% if not game.game_won %}
+                <span class="half-btn gray no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Loss reason">{{ game.lose_reason }}</span>
+                {% endif %}
                 <br>
                 <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Number of Tries">{{ game.number_of_tries }} 🎯</span>
                 <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Game Duration">{{ game.duration|convert_to_readable_time}} ⏲️</span>
