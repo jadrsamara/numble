@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseServerError
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -575,7 +575,7 @@ def game_submit_view(request, game_mode, game_id):
 
 def user_profile(request, username):
 
-    profile_user = User.objects.get(username=username)
+    profile_user = get_object_or_404(User, username=username)
 
     is_same_user = False
     if request.user == profile_user:
