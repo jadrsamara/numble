@@ -108,3 +108,24 @@ class Streak(models.Model):
     streak = models.IntegerField(default=0)
 
     objects = StreakManager()
+
+
+class ResetPasswordManager(models.Manager):
+    def create_reset_password(self, user):
+        reset_password = self.create(
+            user = user,
+            date_reset_counter = 1,
+            date = (timezone.now() + timezone.timedelta(days=1)).date(),
+        )
+        return reset_password
+
+
+class ResetPassword(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    date = models.DateField()
+    date_reset_counter = models.IntegerField(default=0)
+
+    objects = ResetPasswordManager()

@@ -36,6 +36,8 @@ urlpatterns = [
     # path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
     # path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
 
+    # path('test_view/', views.test_view, name='test_view'),
+
     # --- App ---
 
     path("play/", views.play_view, name="play_view"),

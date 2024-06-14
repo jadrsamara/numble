@@ -1,10 +1,26 @@
 {% load static %}
 {% load custom_template_tags %}
+<!DOCTYPE html>
 
 <html lang="en" data-bs-theme="{% get_theme request %}">
 
 <head>
-    <link rel="shortcut icon" type="image/ico" href="{% static 'play/images/favicon.ico' %}">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FQNYV1X3S8"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-FQNYV1X3S8');
+    </script>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#2d89ef">
+    <meta name="theme-color" content="#ffffff">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,11 +31,11 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- info for bots -->
-    <meta property="og:title" content="Numble" />
+    <meta property="og:title" content="Numble.One - Can you guess the Number?" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://numble.one" />
     <meta property="og:image:url" content="https://numble.one/static/play/images/thumb.png" />
-    <meta property="og:description" content="Numbers game where you try to guess a number using simple visual cues" />
+    <meta property="og:description" content="Numble.One (نمبل), a unique number guessing game similar to Wordle but with numbers! Featuring various modes including normal with visual hints, blind play with only text hints, daily and more. Challenge your mind with visual cues and addictive gameplay!" />
     <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:og="http://ogp.me/ns#"
       xmlns:fb="https://www.facebook.com/2008/fbml">
@@ -29,9 +45,9 @@
     <link rel="stylesheet" href="{% static 'play/css/game.css' %}">
     <link rel="stylesheet" href="{% static 'play/css/profile.css' %}">
     <meta charset="utf-8">
-    <meta name="description" content="Numble the numbers game">
+    <meta name="description" content="Numble.One (نمبل), a unique number guessing game similar to Wordle but with numbers! Featuring various modes including normal with visual hints, blind play with only text hints, daily and more. Challenge your mind with visual cues and addictive gameplay!">
     <meta name="author" content="Jad Samara">
-    <title>Numble</title>
+    <title>Numble.One - Can you guess the Number?</title>
 </head>
 
 <body>

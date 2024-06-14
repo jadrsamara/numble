@@ -13,6 +13,9 @@ import datetime
 import random as random_with_seed
 import logging
 import re
+import requests
+import json
+
 
 from .models import Game, Leaderboard, Streak
 
@@ -29,7 +32,7 @@ GAME_TRIES_LIMIT = {
     '1v1': 7,
 }
 GAME_TIMEOUT = 15
-game_modes = ['easy', 'medium', 'hard', 'daily', 'blind', '1v1']
+game_modes = ['easy', 'medium', 'hard', 'daily', 'blind']
 
 
 request_logger = logging.getLogger("django")
@@ -46,6 +49,65 @@ def index(request):
 
 def about_view(request):
     return HttpResponse("made by Jad Samara\ncontact@numble.one")
+
+
+def test_view(request):
+    api_key = os.environ['MJ_APIKEY_PUBLIC']
+    api_secret = os.environ['MJ_APIKEY_PRIVATE']
+
+    # Email details
+    sender_email = 'no-reply@numble.one'
+    sender_name = 'Numble'
+
+    recipient_email = 'jadsamara@yahoo.com'
+    recipient_name = 'Jad Samara'
+
+    # Mailjet template ID
+    template_id = 6052196
+
+    # Variables to pass to the template
+    variables = {
+        'url': 'https://numble.one',
+        'username': 'jadrsamara'
+    }
+
+    # API endpoint for sending email
+    url = 'https://api.mailjet.com/v3.1/send'
+
+    # Email payload
+    payload = {
+        'Messages': [
+            {
+                'From': {
+                    'Email': sender_email,
+                    'Name': sender_name
+                },
+                'To': [
+                    {
+                        'Email': recipient_email,
+                        'Name': recipient_name
+                    }
+                ],
+                'TemplateID': template_id,
+                'TemplateLanguage': True,
+                'Variables': variables
+            }
+        ]
+    }
+
+    # Send the request
+    response = requests.post(
+        url,
+        auth=(api_key, api_secret),
+        headers={'Content-Type': 'application/json'},
+        data=json.dumps(payload)
+    )
+
+    # Print response
+    print(response.status_code)
+    print(response.json())
+
+    return HttpResponse(response.status_code)
 
 
 def switch_theme_view(request):
@@ -630,7 +692,10 @@ def leaderboard_view(request):
     template_name = "play/leaderboard.html"
 
     Leaderboard_game_modes = game_modes[:]
-    Leaderboard_game_modes.remove('1v1')
+    try:
+        Leaderboard_game_modes.remove('1v1')
+    except ValueError:
+        pass
 
     request_game_mode = request.GET.get('game_mode')
 
