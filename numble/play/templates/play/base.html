@@ -91,7 +91,12 @@
     <main role="main" class="justify-content-center">
         {% block content %}
         {% endblock %}
-
+        <script src="https://unpkg.com/htmx.org@1.1.0"></script>
+        <script>
+            document.body.addEventListener('htmx:configRequest', (event) => {
+              event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+            })
+          </script>
         <div id="loading_container" class="loading_container" style="display: none;">
             <div class="loading"></div>
         </div>
@@ -145,25 +150,12 @@
         } else {
             displaying = false;
         }
-
-        window.requestAnimationFrame(function() {
-        target.classList.toggle(animationClass);
-        doneTimedDisplay = false;     
-        });
-
-        if (!displaying) {
         setTimeout(function() {
-            // failsafe for transitioned not firing
-            if (!doneTimedDisplay) {
-            target.style.display = 'none';
-            }
-            doneTimedDisplay = true;
+            target.style.display = "none";
         }, timeout);
-        }
     };
     navigation.addEventListener('navigate', () => {
-        // document.getElementById("loading_container").style.display = "inline-block";
-        animateDisplay(document.querySelector('.loading_container'), 'show', 'block', 500)
+        animateDisplay(document.querySelector('.loading_container'), 'show', 'block', 1000)
     });
 </script>
 

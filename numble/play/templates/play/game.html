@@ -29,6 +29,7 @@
     <h3>Can you guess the {{ game_mode_len }}-digit number in {{ GAME_TRIES_LIMIT }} tries?</h3>
     {% endif %}
 
+    <div id="parent-div">
     {% for i in game_tries_range %}
     <div class="numbers-row">
         {% for j in game_mode_range %}
@@ -36,22 +37,27 @@
         {% endfor %}
     </div>
     {% endfor %}
+    </div>
 
-    {% if can_current_request_user_play %}
-    <form action=" {% url 'play:game_submit_view' game_mode=game.game_mode game_id=game.pk %} " method="post">
-        {% csrf_token %}
-        <div class="numbers-row">
-            {% for i in game_mode_range %}
-            <input type="number" id="input_cell{{i}}" name="input_cell{{i}}" maxlength="1" class="btn_ white  row-item"
-                autofocus onfocus="this.select(); this.click();"
-                oninput="javascript: if (this.value.length >= this.maxLength) {this.value = this.value.slice(0, this.maxLength); this.nextElementSibling.focus();}"
-                required>
-            {% endfor %}
-        </div>
-        <br>
-        <div class="numbers-row"><input type="submit" class="btn_ blue submit" value="Submit"></div>
-    </form>
-    {% endif %}
+    <div id="user-input">
+        {% if can_current_request_user_play %}
+        <form hx-post="{% url 'play:game_submit_view' game_mode=game.game_mode game_id=game.pk %}"
+            hx-trigger="submit"
+            hx-target="#parent-div">
+            {% csrf_token %}
+            <div class="numbers-row">
+                {% for i in game_mode_range %}
+                <input type="number" id="input_cell{{i}}" name="input_cell{{i}}" maxlength="1" class="btn_ white  row-item"
+                    autofocus onfocus="this.select(); this.click();"
+                    oninput="javascript: if (this.value.length >= this.maxLength) {this.value = this.value.slice(0, this.maxLength); this.nextElementSibling.focus();}"
+                    required>
+                {% endfor %}
+            </div>
+            <br>
+            <div class="numbers-row"><input type="submit" class="btn_ blue submit" value="Submit"></div>
+        </form>
+        {% endif %}
+    </div>
 
     <br>
 
@@ -65,15 +71,9 @@
         {% endfor %}
     </div>
     <br>
-    <!-- <audio id="myAudio">
-        <source src="{% static 'play/sounds/lose.mp3' %}" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio> -->
+
     {% else %}
-    <!-- <audio id="myAudio">
-        <source src="{% static 'play/sounds/win.mp3' %}" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio> -->
+
     <div class="confetti fixed-top">
         <div class="confetti-piece"></div>
         <div class="confetti-piece"></div>
@@ -90,18 +90,6 @@
         <div class="confetti-piece"></div>
     </div>
     {% endif %}
-
-    <!-- <script>
-        var audio = document.getElementById("myAudio"); 
-        function playAudio() {
-            try {
-                audio.play();
-            } catch ({ name, message }) {}
-        } 
-        document.body.addEventListener("mousedown", function () {
-            playAudio()
-        })
-    </script> -->
 
     <p><strong>Game Stats:</strong></p>
     <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" 
@@ -122,21 +110,22 @@
     </ul>
 
     <br><br>
+
     {% if game.user.username == 'Tutorial' %}
     <strong><a id="newgame" href="{% url 'play:game_view' game.game_mode %}" autofocus>Start a new game</a></strong>
     {% else %}
     <strong><a id="newgame" href="{% url 'play:game_view' game.game_mode %}" autofocus>Play again?</a></strong>
+    {% endif %}
 
     <script>
         document.getElementById("newgame").focus()
     </script>
 
-    {% endif %}
 
     {% endif %}
 
     {% if not game.game_completed and request.user == game.user %}
-    <form action="{% url 'play:game_forfeit_view' game.game_mode game.pk %}" method="post">
+    <form id="forfeit" action="{% url 'play:game_forfeit_view' game.game_mode game.pk %}" method="post">
         {% csrf_token %}
         <div class="numbers-row"><input type="submit" class="btn_ red" value="Forfeit Game"></div>
     </form>

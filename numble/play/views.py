@@ -52,6 +52,45 @@ def about_view(request):
     return HttpResponse("made by Jad Samara\ncontact@numble.one")
 
 
+def htmx_view(request):
+
+    number = str(get_a_new_game_number('easy', request))
+
+    return render(
+        request,
+        'play/htmx.html',
+        {
+            "game_tries": [number],
+            "game_tries_range": range(1),
+            "game_mode_range": range(4),
+            "game_mode_len": 4,
+            "GAME_TRIES_LIMIT": GAME_TRIES_LIMIT['easy'],
+            "can_current_request_user_play": True,
+        }
+    )
+
+
+@require_http_methods(["POST"])
+def htmx_get_view(request):
+
+    number = str(get_a_new_game_number('easy', request))
+
+    number_list = []
+    for i in request.POST:
+        number_list.append(request.POST[i])
+    number = ''.join(number_list)
+
+    return render(
+        request,
+        'play/htmx-get.html',
+        {
+            "game_tries": [number],
+            "game_tries_range": range(1),
+            "game_mode_range": range(4),
+        }
+    )
+
+
 def test_view(request):
     api_key = os.environ['MJ_APIKEY_PUBLIC']
     api_secret = os.environ['MJ_APIKEY_PRIVATE']
@@ -570,9 +609,37 @@ def game_forfeit_view(request, game_mode, game_id):
     game.save()
 
     return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
-    
 
-# @login_required(login_url='/login/')
+
+def htmx_game_submit(request, game):
+
+    tries = []
+    last_try = '0000'
+    for i in range(1, GAME_TRIES_LIMIT[game.game_mode] + 1):
+        game_try = game.tries.get(f"try{i}")
+        if game_try is None:
+            break
+        tries.append(game_try)
+        last_try = game_try
+
+    if game.game_mode == 'blind':
+        template_name = 'play/htmx-blind-game-submit.html'
+    else:
+        template_name = 'play/htmx-game-submit.html'
+
+    return render(
+        request,
+        template_name,
+        {
+            "game_tries": tries,
+            "game_tries_range": range(len(game.tries)),
+            "game_mode_range": range(len(game.number)),
+            "game": game,
+            "game_last_try": last_try,
+        }
+    )
+
+
 @require_http_methods(["POST"])
 def game_submit_view(request, game_mode, game_id):
 
@@ -584,7 +651,8 @@ def game_submit_view(request, game_mode, game_id):
         return HttpResponseNotFound()
     
     if game.game_completed:
-        return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+        # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+        return htmx_game_submit(request, game)
     
     expire_time = datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc)
     if expire_time < timezone.now():
@@ -596,7 +664,8 @@ def game_submit_view(request, game_mode, game_id):
     
         game.save()
 
-        return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+        # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+        return htmx_game_submit(request, game)
 
     new_number_try = []
 
@@ -633,7 +702,8 @@ def game_submit_view(request, game_mode, game_id):
     
     game.save()
 
-    return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+    # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+    return htmx_game_submit(request, game)
 
 
 def user_profile(request, username):

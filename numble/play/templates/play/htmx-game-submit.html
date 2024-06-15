@@ -1,0 +1,122 @@
+{% load static %}
+{% load custom_template_tags %}
+
+<div id="parent-div">
+    <script>
+        document.getElementById('input_cell0').value = '';
+        document.getElementById('input_cell1').value = '';
+        document.getElementById('input_cell2').value = '';
+        document.getElementById('input_cell3').value = '';
+        try {
+            document.getElementById('input_cell4').value = '';
+        } catch (error) {}
+        try {
+            document.getElementById('input_cell5').value = '';
+        } catch (error) {}
+        document.getElementById("input_cell0").focus()
+    </script>
+
+    {% for i in game_tries_range %}
+    <div class="numbers-row">
+        {% for j in game_mode_range %}
+        <button type="number" class="btn_ {% get_color game i j %} row-item center-logo">{% get_value_2d game_tries i j %}</button>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    {% if game.game_completed %}
+    <br>
+    {% if not game.game_won %}
+    <strong>Correct number:</strong>
+    <div class="numbers-row">
+        {% for i in game_mode_range %}
+        <input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1" class="btn_ yellow row-item"
+            value="{% get_value_1d game.number i %}" disabled>
+        {% endfor %}
+    </div>
+    <br>
+    <audio id="audio">
+        <source src="{% static 'play/sounds/lose.mp3' %}" type="audio/mpeg" muted>
+        Your browser does not support the audio element.
+    </audio>
+    {% else %}
+    <audio id="audio">
+        <source src="{% static 'play/sounds/win.mp3' %}" type="audio/mpeg" muted>
+        Your browser does not support the audio element.
+    </audio>
+    <div class="confetti fixed-top">
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+    </div>
+    {% endif %}
+
+    <script>
+        var userInputDivId = 'user-input'
+        var forfeitDivId = 'forfeit'
+        
+        var userInputDiv = document.getElementById(userInputDivId);
+        if (userInputDiv) {
+            userInputDiv.style.display = 'none';
+        }
+        var forfeitDiv = document.getElementById(forfeitDivId);
+        if (forfeitDiv) {
+            forfeitDiv.style.display = 'none';
+        }
+        
+
+        var targetDivId = 'content';
+        var audio = document.getElementById('audio');
+
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            var targetDiv = document.getElementById(targetDivId);
+            if (targetDiv && event.detail.target.id === targetDivId) {
+                audio.play();
+                audio.muted = false;
+            }
+        });
+
+        var targetDiv = document.getElementById(targetDivId);
+        if (targetDiv && targetDiv.innerHTML.trim() !== "") {
+            audio.play();
+            audio.muted = false;
+        }
+    </script>
+
+    <p id="content"><strong>Game Stats:</strong></p>
+    <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" 
+        title="{{ game.user.first_name }} {{ game.user.last_name }}">👤 {{ game.user.username }}</span>
+    <span class="half-btn blue
+                {% if game.game_mode == 'easy' %}green{% endif %}
+                {% if game.game_mode == 'medium' %}orange{% endif %}
+                {% if game.game_mode == 'hard' %}red{% endif %}
+                no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Game Mode">{{ game.game_mode }}</span>
+    <span class="half-btn blue no-bg-color
+                {% if game.game_won %}yellow{% else %}gray{% endif %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Game Result">{% if game.game_won %}Won 🏆{% else %}Loss ❌{% endif %}</span>
+    {% if not game.game_won %}
+    <span class="half-btn gray no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Loss reason">{{ game.lose_reason }}</span>
+    {% endif %}
+    <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Number of Tries">{{ game.number_of_tries }} 🎯</span>
+    <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="Game Duration">{{ game.duration|convert_to_readable_time}} ⏲️</span>
+    <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ game.date }} {{ game.start_time }}">🗓️ {{ game.date }}</span>
+    </ul>
+
+    <br><br>
+
+    <strong><a id="newgame" href="{% url 'play:game_view' game.game_mode %}" autofocus>Play again?</a></strong>
+    <script>
+        document.getElementById("newgame").focus()
+    </script>
+
+    {% endif %}
+</div>
