@@ -20,6 +20,7 @@ import json
 from .models import Game, Leaderboard, Streak
 
 
+
 base_template = "play/index.html"
 base_reverse = "play:index"
 

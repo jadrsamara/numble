@@ -1,32 +1,39 @@
 {% extends "./base.html" %}
 {% block content %}
 
+<title>Numble - Select a game mode</title>
+
 <div class="wrapper">
     <div class="wrapped">
 
-        <br><br>
+        <section class="p-4 mb-4 rounded">
+            <h1 class="mb-4">Select Game Mode</h1>
 
-        <h1>Select Game Mode</h1>
-        <h2>Normal game modes:</h2>
-        <div class="d-flex align-items-center justify-content-center flex-row menu">
-            <p><a class="btn_ green menu-item" href="{% url 'play:game_view' 'easy' %}">Easy</a></p>
-            <p><a class="btn_ orange menu-item" href="{% url 'play:game_view' 'medium' %}">Medium</a></p>
-            <p><a class="btn_ red menu-item" href="{% url 'play:game_view' 'hard' %}">Hard</a></p>
-        </div>
-        <h2>Other game modes:</h2>
-        <div class="d-flex align-items-center justify-content-center flex-row menu">
-            <p><a class="btn_ yellow menu-item" href="{% url 'play:game_view' 'blind' %}">Blind</a></p>
-            <p><a class="btn_ blue menu-item" href="{% url 'play:game_view' 'daily' %}">Daily</a></p>
-        </div>
-        
-        <br>
-        
-        <!-- <h2>Play with a friend</h2>
-        <p>( Needs to be signed in )</p>
-        <p><a class="btn_ blue menu-item" href="#">1v1</a></p> -->
+            <h2>Normal Modes</h2>
+            <p>Guess the hidden number using visual hints, see <a href="{% url 'play:game_by_id_view' 'easy' 1 %}">How to play.</p>
+            <div class="d-flex align-items-center justify-content-center flex-row menu">
+                <p><a class="btn_ green menu-item" href="{% url 'play:game_view' 'easy' %}">Easy</a></p>
+                <p><a class="btn_ orange menu-item" href="{% url 'play:game_view' 'medium' %}">Medium</a></p>
+                <p><a class="btn_ red menu-item" href="{% url 'play:game_view' 'hard' %}">Hard</a></p>
+            </div>
 
-        <br>
-        <p>Don't know how to play? see <a href="{% url 'play:game_by_id_view' 'easy' 1 %}">How to play.</a>
+            <h2>Blind Play</h2>
+            <p>Challenge yourself with text-based hints only.</p>
+            <div class="d-flex align-items-center justify-content-center flex-row menu">
+                <p><a class="btn_ yellow menu-item" href="{% url 'play:game_view' 'blind' %}">Blind</a></p>
+            </div>
+
+            <h2>Daily Challenge</h2>
+            <p>Compete against the clock with new puzzles daily.</p>
+            <div class="d-flex align-items-center justify-content-center flex-row menu">
+                <p><a class="btn_ blue menu-item" href="{% url 'play:game_view' 'daily' %}">Daily</a></p>
+            </div>
+            
+            <div class="container p-2">
+                <p>Hint: Play every day to get your streak!</p>
+            </div>
+
+        </section>
 
     </div>
 </div>

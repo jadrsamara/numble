@@ -1,0 +1,102 @@
+{% extends "./base.html" %}
+{% block content %}
+
+<title>Numble - Can you guess the Number?</title>
+
+<div class="container d-flex align-items-center justify-content-center flex-column">
+    <br>
+
+    <div>
+        <div class="numbers-row">
+            <button type="number" value="0" class="btn_ orange row-item center-logo">0</button>
+            <button type="number" value="1" class="btn_ gray row-item center-logo">1</button>
+            <button type="number" value="3" class="btn_ green row-item center-logo">3</button>
+        </div>
+        <div class="numbers-row">
+            <button type="number" value="4" class="btn_ gray row-item center-logo">4</button>
+            <button type="number" value="5" class="btn_ green row-item center-logo">5</button>
+            <button type="number" value="2" class="btn_ orange row-item center-logo">2</button>
+        </div>
+        <div class="numbers-row">
+            <button type="number" value="7" class="btn_ green row-item center-logo">7</button>
+            <button type="number" value="8" class="btn_ orange row-item center-logo">8</button>
+            <button type="number" value="6" class="btn_ gray row-item center-logo">6</button>
+        </div>
+    </div>
+
+    <br>
+
+    <h1>Numble</h1> 
+    <h2>Can you guess the number?</h2>
+    <p style="max-width: 800px;">Welcome to Numble.One (نمبل), the exciting number guessing game that combines the 
+        addictive gameplay of Wordle with numerical challenges! Whether you're a puzzle 
+        enthusiast or looking to sharpen your mental acuity, Numble.One offers an engaging 
+        experience across various gameplay modes.</p>
+    
+    <h3>Gameplay Modes:</h3>
+    <p>Numble.One features several modes to cater to different preferences:</p>
+    <ul>
+        <li><strong>Normal Mode:</strong> Guess the hidden number using visual hints, progressively narrowing down the possibilities with each guess.</li>
+        <li><strong>Blind Play:</strong> Challenge yourself with text-based hints only, testing your deduction skills without visual aids.</li>
+        <li><strong>Daily Challenge:</strong> Compete against the clock to solve a new puzzle every day, earning rewards and sharpening your numerical intuition.</li>
+    </ul>
+    
+    <h3>How to Play:</h3>
+    <p>Playing Numble.One is simple yet challenging:</p>
+    <ul>
+        <li>Study the visual or text hints provided to deduce the hidden number.</li>
+        <li>Input your guess and receive feedback on how close your guess is to the correct number.</li>
+        <li>Continue guessing until you uncover the mystery number within the given attempts.</li>
+    </ul>
+
+    <a href="{% url 'play:play_view' %}">
+        <h1 class="btn_ yellow">Play Now!</h1>
+    </a>
+
+    <h3>Benefits of Playing Numble.One:</h3>
+    <ul>
+        <li><strong>Mental Exercise:</strong> Boost your cognitive skills by analyzing clues and making strategic guesses.</li>
+        <li><strong>Accessible:</strong> Suitable for players of all ages and skill levels, providing an inclusive gaming experience.</li>
+        <li><strong>Addictive Fun:</strong> Experience the thrill of solving puzzles and improving your performance with each game.</li>
+    </ul>
+
+    <h3>Why Choose Numble.One?</h3>
+    <p>Numble.One stands out with its intuitive interface, challenging puzzles, and regular updates 
+        to keep gameplay fresh and exciting. Whether you prefer playing casually or competitively, 
+        Numble.One offers a dynamic gaming experience that rewards both logic and intuition.</p>
+
+    <br>
+
+    <p>Start playing Numble.One today and immerse yourself in a world of numerical challenges 
+        and strategic thinking. Discover why players worldwide are captivated by Numble.One's 
+        unique blend of innovation and classic puzzle-solving excitement!</p>
+
+    <div class="hide-if-screen-too-small">
+        <br>
+    </div>
+    {% if not user.is_authenticated %}
+    <div>
+        <h4>Sign up / Log in</h4>
+    </div>
+    <div>
+        <h5 class="text-muted">to get stats and play more modes</h5>
+    </div>
+    <div>
+        <a class="half-btn blue" href="{% url 'play:signup_view' %}">Sign up</a>
+        <a class="half-btn blue" href="{% url 'play:login_view' %}">Log in</a>
+    </div>
+    {% else %}
+    <br>
+    <div class="hide-if-screen-too-small">
+        <br>
+    </div>
+    <div>
+        <h3>Welcome</h3>
+    </div>
+    <div>
+        <h2>{{ request.user.username }}</h2>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

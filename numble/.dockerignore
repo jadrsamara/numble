@@ -34,5 +34,7 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
+**/.env*
+**/static/*
 LICENSE
 README.md

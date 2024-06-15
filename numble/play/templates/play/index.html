@@ -1,9 +1,11 @@
 {% extends "./base.html" %}
 {% block content %}
 
+<title>Numble - Can you guess the Number?</title>
+
 <div class="container d-flex align-items-center justify-content-center flex-column">
     <br>
-    <br>
+
     <div>
         <div class="numbers-row">
             <button type="number" value="0" class="btn_ orange row-item center-logo">0</button>
@@ -21,44 +23,70 @@
             <button type="number" value="6" class="btn_ gray row-item center-logo">6</button>
         </div>
     </div>
+
     <br>
-    <div>
-        <h4>Can you guess the number?</h4>
+
+    <div class="p-2">
+        <div class="text-center">
+            <h2 class="mb-0">Welcome to Numble نمبل</h2>
+            <p class="lead">The number guessing game</p>
+        </div>
     </div>
-    <div class="hide-if-screen-too-small">
-        <br>
-    </div>
-    <div>
-        <a href="{% url 'play:play_view' %}">
-            <h1 class="btn_ yellow">Play Now!</h1>
-        </a>
-    </div>
-    <div class="hide-if-screen-too-small">
-        <br>
-    </div>
-    {% if not user.is_authenticated %}
-    <div>
-        <h4>Sign up / Log in</h4>
-    </div>
-    <div>
-        <h5 class="text-muted">to get stats and play more modes</h5>
-    </div>
-    <div>
-        <a class="half-btn blue" href="{% url 'play:signup_view' %}">Sign up</a>
-        <a class="half-btn blue" href="{% url 'play:login_view' %}">Log in</a>
-    </div>
-    {% else %}
+
+    <a href="{% url 'play:play_view' %}">
+        <h1 class="btn_ yellow">Play Now!</h1>
+    </a>
+
     <br>
-    <div class="hide-if-screen-too-small">
-        <br>
+
+    <div class="p-2">
+        <div class="row">
+
+            <section class="p-4 mb-4 rounded shadow col-md-6 col-sm-12">
+                <h2 class="mb-4">How to Play</h2>
+                <ol>
+                    <li>Study the visual or text hints provided to deduce the hidden number.</li>
+                    <li>Input your guess and receive feedback on how close your guess is.</li>
+                    <li>Continue guessing until you uncover the mystery number.</li>
+                </ol>
+            </section>
+
+            <section class="p-4 mb-4 rounded shadow col-md-6 col-sm-12">
+                <h2 class="mb-4">Gameplay Modes</h2>
+                <ul>
+                    <li><strong>Normal Mode:</strong> Guess the hidden number using visual hints.</li>
+                    <li><strong>Blind Play:</strong> Challenge yourself with text-based hints only.</li>
+                    <li><strong>Daily Challenge:</strong> Compete against the clock with new puzzles daily.</li>
+                </ul>
+            </section>
+
+            <section class="p-4 mb-4 rounded shadow col-md-6 col-sm-12">
+                <h2 class="mb-4">Benefits of Playing Numble.One</h2>
+                <ul>
+                    <li>Mental Exercise: Boost cognitive skills and strategic thinking.</li>
+                    <li>Accessible: Suitable for players of all ages and skill levels.</li>
+                    <li>Addictive Fun: Experience the thrill of solving puzzles.</li>
+                </ul>
+            </section>
+
+            <section class="p-4 mb-4 rounded shadow col-md-6 col-sm-12">
+                <h2 class="mb-4">Why Choose Numble.One?</h2>
+                <ul>
+                    <li>Intuitive Interface: Easy to navigate and play.</li>
+                    <li>Regular Updates: Fresh content and features.</li>
+                    <li>Community: Connect with players and share strategies.</li>
+                </ul>
+            </section>
+        </div>
     </div>
-    <div>
-        <h3>Welcome</h3>
+
+    <div class="index-footer">
+        <div class="container p-5">
+            <p>Start playing Numble.One today and enjoy the challenge!</p>
+        </div>
     </div>
-    <div>
-        <h2>{{ request.user.username }}</h2>
-    </div>
-    {% endif %}
+
+
 </div>
 
 {% endblock %}
