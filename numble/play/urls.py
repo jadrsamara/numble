@@ -12,9 +12,6 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("about/", views.about_view, name="about_view"),
 
-    path("htmx/", views.htmx_view, name="htmx_view"),
-    path("htmx/get/", views.htmx_get_view, name="htmx_get_view"),
-
     # --- User paths ---
 
     # path("user/", views.user, name="user"), 

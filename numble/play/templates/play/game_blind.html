@@ -160,10 +160,11 @@
 
     {% endif %}
 
-    {% endif %}
-
     {% if not game.game_completed and request.user == game.user %}
-    <form id="forfeit" action="{% url 'play:game_forfeit_view' game.game_mode game.pk %}" method="post">
+    <form id="forfeit"
+        hx-post="{% url 'play:game_forfeit_view' game.game_mode game.pk %}"
+        hx-trigger="click"
+        hx-target="#parent-div">
         {% csrf_token %}
         <div class="numbers-row"><input type="submit" class="btn_ red" value="Forfeit Game"></div>
     </form>

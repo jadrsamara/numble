@@ -48,47 +48,9 @@ def index(request):
         base_template,
     )
 
+
 def about_view(request):
     return HttpResponse("made by Jad Samara\ncontact@numble.one")
-
-
-def htmx_view(request):
-
-    number = str(get_a_new_game_number('easy', request))
-
-    return render(
-        request,
-        'play/htmx.html',
-        {
-            "game_tries": [number],
-            "game_tries_range": range(1),
-            "game_mode_range": range(4),
-            "game_mode_len": 4,
-            "GAME_TRIES_LIMIT": GAME_TRIES_LIMIT['easy'],
-            "can_current_request_user_play": True,
-        }
-    )
-
-
-@require_http_methods(["POST"])
-def htmx_get_view(request):
-
-    number = str(get_a_new_game_number('easy', request))
-
-    number_list = []
-    for i in request.POST:
-        number_list.append(request.POST[i])
-    number = ''.join(number_list)
-
-    return render(
-        request,
-        'play/htmx-get.html',
-        {
-            "game_tries": [number],
-            "game_tries_range": range(1),
-            "game_mode_range": range(4),
-        }
-    )
 
 
 def test_view(request):
@@ -597,8 +559,9 @@ def game_forfeit_view(request, game_mode, game_id):
         return HttpResponseNotFound()
     
     if game.game_completed:
-        return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
-    
+        # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+        return htmx_game_submit(request, game)
+
     expire_time = datetime.datetime.combine(date=game.expire_date, time=game.expire_time, tzinfo=datetime.timezone.utc)
     game.game_completed = True
     game.finish_time = timezone.now()
@@ -608,7 +571,8 @@ def game_forfeit_view(request, game_mode, game_id):
 
     game.save()
 
-    return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+    # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
+    return htmx_game_submit(request, game)
 
 
 def htmx_game_submit(request, game):
