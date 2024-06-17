@@ -103,7 +103,7 @@
     </main>
 
     <footer class="footer fixed-bottom d-flex p-1 justify-content-between header-bg">
-        <div class="user_stats">
+        <div class="user_stats" id="user_stats">
             {% if user.is_authenticated %}
             {% get_user_stats user as user_stats %}
             <span>🔥 {{user_stats.streak}}</span><span class="user_stats_hidden_content"> day streak</span>
@@ -155,7 +155,7 @@
         }, timeout);
     };
     navigation.addEventListener('navigate', () => {
-        animateDisplay(document.querySelector('.loading_container'), 'show', 'block', 1000)
+        animateDisplay(document.querySelector('.loading_container'), 'show', 'block', 2000)
     });
 </script>
 

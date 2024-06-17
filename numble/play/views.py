@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseServerError, HttpResponseForbidden, HttpResponseBadRequest
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
@@ -16,9 +16,9 @@ import re
 import requests
 import json
 
+from secrets import token_urlsafe
 
-from .models import Game, Leaderboard, Streak
-
+from .models import Game, Leaderboard, Streak, ResetPassword
 
 
 base_template = "play/index.html"
@@ -50,66 +50,7 @@ def index(request):
 
 
 def about_view(request):
-    return HttpResponse("made by Jad Samara\ncontact@numble.one")
-
-
-def test_view(request):
-    api_key = os.environ['MJ_APIKEY_PUBLIC']
-    api_secret = os.environ['MJ_APIKEY_PRIVATE']
-
-    # Email details
-    sender_email = 'no-reply@numble.one'
-    sender_name = 'Numble'
-
-    recipient_email = 'jadsamara@yahoo.com'
-    recipient_name = 'Jad Samara'
-
-    # Mailjet template ID
-    template_id = 6052196
-
-    # Variables to pass to the template
-    variables = {
-        'url': 'https://numble.one',
-        'username': 'jadrsamara'
-    }
-
-    # API endpoint for sending email
-    url = 'https://api.mailjet.com/v3.1/send'
-
-    # Email payload
-    payload = {
-        'Messages': [
-            {
-                'From': {
-                    'Email': sender_email,
-                    'Name': sender_name
-                },
-                'To': [
-                    {
-                        'Email': recipient_email,
-                        'Name': recipient_name
-                    }
-                ],
-                'TemplateID': template_id,
-                'TemplateLanguage': True,
-                'Variables': variables
-            }
-        ]
-    }
-
-    # Send the request
-    response = requests.post(
-        url,
-        auth=(api_key, api_secret),
-        headers={'Content-Type': 'application/json'},
-        data=json.dumps(payload)
-    )
-
-    # Print response
-    print(response.status_code)
-    print(response.json())
-
-    return HttpResponse(response.status_code)
+    return HttpResponse("made by Jad Samara\ncontact@numble.one\n")
 
 
 def switch_theme_view(request):
@@ -152,6 +93,10 @@ def is_valid_email(email):
     
 
 def is_valid_username(username):
+
+    if not len(username) >= 3:
+        return False
+
     regex = r'\b[a-zA-Z0-9\.\_]*\b'
     if(re.fullmatch(regex, username)):
         return True
@@ -172,6 +117,15 @@ def signup_done_view(request):
                 sign_up_template,
                 {
                     "error_message": "Email or Username exceeded the character limit",
+                },
+            )
+        
+        if len(request.POST["password"]) < 8:
+            return render(
+                request,
+                sign_up_template,
+                {
+                    "error_message": "Password is less than 8 characters long",
                 },
             )
         
@@ -213,6 +167,7 @@ def signup_done_view(request):
                     "error_message": "Username is already registered!",
                 },
             )
+        
         return True
 
     validation_result = validate(request)
@@ -747,12 +702,254 @@ def leaderboard_view(request):
     is_list_empty = len(top_games) == 0
     
     return render(
+        request,
+        template_name,
+        {
+            "is_list_empty": is_list_empty,
+            "top_games": top_games,
+            "game_mode": request_game_mode,
+            "other_modes": Leaderboard_game_modes,
+        }
+    )
+
+
+def password_reset_view(request):
+
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse(base_reverse))
+    
+    template_name = 'play/password-reset/password-reset.html'
+
+    try:
+        email_or_username = request.POST["email_or_username"]
+    except KeyError:
+        email_or_username = False
+
+    if not email_or_username:
+        return render(
+            request,
+            template_name,
+        )
+    
+    error = send_reset_password_email_if_eligible(request)
+
+    if error:
+        return render(
             request,
             template_name,
             {
-                "is_list_empty": is_list_empty,
-                "top_games": top_games,
-                "game_mode": request_game_mode,
-                "other_modes": Leaderboard_game_modes,
+                "email_or_username": email_or_username,
+                "error_message": error,
             }
-           )
+        )
+
+    return render(
+        request,
+        template_name,
+        {
+            "email_or_username": email_or_username,
+            "disabled": "disabled",
+            "disabled_color": "gray",
+        }
+    )
+
+
+def send_reset_password_email_if_eligible(request):
+
+    if not 50 >= len(request.POST["email_or_username"]) >= 3:
+        return 'The entered Email / Username is invalid'
+    
+    if not is_valid_email(request.POST["email_or_username"]) and not is_valid_username(request.POST["email_or_username"]):
+        return 'The entered Email / Username is invalid'
+
+    email = User.objects.filter(email=request.POST["email_or_username"])
+    username = User.objects.filter(username=request.POST["email_or_username"])
+
+    user = False
+
+    if len(list(email)) > 0:
+        user = list(email)[0]
+
+    if len(list(username)) > 0:
+        user = list(username)[0]
+    
+    if user:
+        success = generate_new_token_and_send_reset_email(user)
+        if not success:
+            return "Error: something went wrong, please try again later"
+
+    return False
+
+
+def generate_new_token_and_send_reset_email(user):
+
+    reset_password = ResetPassword.objects.filter(user=user).first()
+
+    if reset_password == None:
+        reset_password = ResetPassword.objects.create_reset_password(user)
+
+    user_date_counter = reset_password.date_reset_counter
+    is_same_date = reset_password.date.date() == timezone.now().date()
+    
+    if is_same_date and user_date_counter >= 3:
+        return False
+
+    reset_password.date = timezone.now()
+    reset_password.expire_date = timezone.now() + timezone.timedelta(minutes=15)
+    reset_password.token = f'{token_urlsafe()}{token_urlsafe()}'
+
+    if is_same_date:
+        reset_password.date_reset_counter = user_date_counter + 1
+    else:
+        reset_password.date_reset_counter = 1
+    
+    reset_password.save()
+    
+    return send_reset_password_email(user.email, user.username, reset_password.token)
+
+
+def send_reset_password_email(email, username, token):
+    api_key = os.environ['MJ_APIKEY_PUBLIC']
+    api_secret = os.environ['MJ_APIKEY_PRIVATE']
+
+    domain = os.environ['DOMAIN']
+
+    # Email details
+    sender_email = f'no-reply@{domain}'
+    sender_name = 'Numble'
+
+    recipient_email = email
+    recipient_name = username
+
+    # Mailjet template ID
+    template_id = int(os.environ['MJ_TEMPLATE_ID'])
+
+    # Variables to pass to the template
+    variables = {
+        'url': f'https://{domain}{reverse("play:password_reset_submit_view")}?token={token}',
+        'username': username
+    }
+
+    # API endpoint for sending email
+    url = 'https://api.mailjet.com/v3.1/send'
+
+    # Email payload
+    payload = {
+        'Messages': [
+            {
+                'From': {
+                    'Email': sender_email,
+                    'Name': sender_name
+                },
+                'To': [
+                    {
+                        'Email': recipient_email,
+                        'Name': recipient_name
+                    }
+                ],
+                'TemplateID': template_id,
+                'TemplateLanguage': True,
+                'Variables': variables
+            }
+        ]
+    }
+
+    # Send the request
+    response = requests.post(
+        url,
+        auth=(api_key, api_secret),
+        headers={'Content-Type': 'application/json'},
+        data=json.dumps(payload)
+    )
+
+    # Print response
+    if response.status_code == 200:
+        request_logger.info(f'password reset email requested, {response.status_code} '+str({
+            "user": str(username),
+            "email": email,
+            "response": response.json(),
+            "payload": json.dumps(payload)
+        }))
+        return True
+    else:
+        request_logger.warn(f'password reset email requested, {response.status_code} '+str({
+            "user": str(username),
+            "email": email,
+            "response": response.json(),
+            "payload": json.dumps(payload)
+        }))
+        return False
+    
+
+def password_reset_submit_view(request):
+
+    token = request.GET.get("token", False)
+
+    if token:
+        valid_token = ResetPassword.objects.filter(token=token).first()
+    else: 
+        return HttpResponseForbidden()
+    
+    if valid_token.expire_date < timezone.now():
+        return HttpResponseForbidden()
+    
+    template_name = 'play/password-reset/password-reset-submitted.html'
+
+    return render(
+        request,
+        template_name,
+        {
+            "username": valid_token.user.username,
+            "token": token,
+        }
+    )
+
+
+@require_http_methods(["POST"])
+def password_reset_done_view(request):
+
+    token = request.GET.get("token", False)
+    password = request.POST.get("password", False)
+    password2 = request.POST.get("password2", False)
+
+    if not token:  
+        return HttpResponseForbidden()
+    
+    if not password:
+        return HttpResponseBadRequest()
+    
+    if token:
+        valid_token = ResetPassword.objects.filter(token=token).first()
+    else: 
+        return HttpResponseForbidden()
+    
+    if valid_token.expire_date < timezone.now():
+        return HttpResponseForbidden()
+    
+    template_name = 'play/password-reset/password-reset-submitted.html'
+
+    error = False
+
+    if len(password) < 8:
+        error = True
+        error_message = "Password is less than 8 characters long"
+        
+    if password != password2:
+        error = True
+        error_message = "The 2 entered passwords don't match"
+
+    if error:
+        return render(
+            request,
+            template_name,
+            {
+                "username": valid_token.user.username,
+                "token": token,
+                "error_message": error_message,
+            }
+        )
+    else:
+        valid_token.user.password = password
+        valid_token.user.save()
+        login(request, valid_token.user)
+        return HttpResponseRedirect(reverse(base_reverse))

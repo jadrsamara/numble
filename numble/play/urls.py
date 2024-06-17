@@ -11,16 +11,14 @@ urlpatterns = [
 
     path("", views.index, name="index"),
     path("about/", views.about_view, name="about_view"),
+    path("switch_theme/", views.switch_theme_view, name="switch_theme_view"),
 
     # --- User paths ---
 
     # path("user/", views.user, name="user"), 
     re_path(r"^user/(?P<username>[a-zA-Z0-9\.\_]*)/$", views.user_profile, name="user_profile"),
-
-    path("switch_theme/", views.switch_theme_view, name="switch_theme_view"),
-
-    # path("user/<slug:game_mode>/update", views.play_view, name="play_view"),
-    # path("user/<slug:game_mode>/update/done/", views.play_view, name="play_view"),
+    # re_path(r"^user/(?P<username>[a-zA-Z0-9\.\_]*)/edit/$", views.user_edit_profile, name="user_edit_profile"),
+    # re_path(r"^user/(?P<username>[a-zA-Z0-9\.\_]*)/edit/done/$", views.user_edit_profile_done, name="user_edit_profile_done"),
 
     path("signup/", views.signup_view, name="signup_view"),
     path("signup/done/", views.signup_done_view, name="signup_done_view"),
@@ -30,13 +28,15 @@ urlpatterns = [
 
     path("logout/", views.logout_view, name="logout_view"),
 
+    # most likely no need since user can change password from edit profile
     # path('password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
     # path('password_change/done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done'),
 
-    # path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
-    # path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
-
-    # path('test_view/', views.test_view, name='test_view'),
+    # request a password change
+    path('password_reset/', views.password_reset_view, name='password_reset_view'),
+    # link from email (query parameters)
+    path('password_reset/submit/', views.password_reset_submit_view, name='password_reset_submit_view'),
+    path('password_reset/done/', views.password_reset_done_view, name='password_reset_done_view'),
 
     # --- App ---
 

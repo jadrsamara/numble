@@ -43,7 +43,7 @@
                 <tr>
                     {% get_user_streak leaderboard_game.user user_streaks as latest_user_streak%}
                     <th scope="row">{{ leaderboard_game.rank }}{% if leaderboard_game.rank == 1 %} 🥇{% endif %}{% if leaderboard_game.rank == 2 %} 🥈{% endif %}{% if leaderboard_game.rank == 3 %} 🥉{% endif %}</th>
-                    <td>{{ leaderboard_game.user.username }}</td>
+                    <td><a style="text-decoration: none;" href="{% url 'play:user_profile' leaderboard_game.user.username %}">{{ leaderboard_game.user.username }}&nbsp&nbsp⤴</a></td>
                     <td>{{ leaderboard_game.game.number_of_tries }}</td>
                     <td>{{ leaderboard_game.game.duration|convert_to_readable_time}}</td>
                     {% if game_mode == 'daily' %}

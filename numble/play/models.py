@@ -2,6 +2,7 @@ from typing import Any
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from secrets import token_urlsafe
 
 
 class GameManager(models.Manager):
@@ -114,8 +115,10 @@ class ResetPasswordManager(models.Manager):
     def create_reset_password(self, user):
         reset_password = self.create(
             user = user,
-            date_reset_counter = 1,
-            date = (timezone.now() + timezone.timedelta(days=1)).date(),
+            date_reset_counter = 0,
+            date = timezone.now(),
+            expire_date = timezone.now() + timezone.timedelta(minutes=15),
+            token = f'{token_urlsafe()}{token_urlsafe()}'
         )
         return reset_password
 
@@ -125,7 +128,9 @@ class ResetPassword(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-    date = models.DateField()
+    date = models.DateTimeField()
+    expire_date = models.DateTimeField()
     date_reset_counter = models.IntegerField(default=0)
+    token = models.CharField(max_length=100)
 
     objects = ResetPasswordManager()
