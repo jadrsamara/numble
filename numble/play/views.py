@@ -949,7 +949,8 @@ def password_reset_done_view(request):
             }
         )
     else:
-        valid_token.user.password = password
+        valid_token.user.set_password(password)
         valid_token.user.save()
+
         login(request, valid_token.user)
         return HttpResponseRedirect(reverse(base_reverse))
