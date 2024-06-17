@@ -60,8 +60,11 @@ class NewRelicLogHandler(logging.Handler):
             'X-Insert-Key': self.api_key
         }
 
-        response = requests.post(self.log_api_url, headers=headers, data=compressed_data)
-        if response.status_code != 202:
-            print(f'Failed to send logs: {response.status_code}')
-            print(response.text)
+        try:
+            response = requests.post(self.log_api_url, headers=headers, data=compressed_data)
+            if response.status_code != 202:
+                print(f'Failed to send logs: {response.status_code}')
+                print(response.text)
+        except requests.exceptions.ConnectionError as e:
+            print(e)
 

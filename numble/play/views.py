@@ -890,6 +890,9 @@ def password_reset_submit_view(request):
     else: 
         return HttpResponseForbidden()
     
+    if valid_token == None:
+        return HttpResponseForbidden()
+    
     if valid_token.expire_date < timezone.now():
         return HttpResponseForbidden()
     
