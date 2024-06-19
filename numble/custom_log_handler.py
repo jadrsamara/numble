@@ -23,6 +23,7 @@ class NewRelicLogHandler(logging.Handler):
         request = getattr(record, 'request', {})
         logger_data = getattr(record, 'log_data', {})
         is_request_log = getattr(record, 'request_log', {})
+        logger_message = getattr(record, 'logger_message', {})
 
         log_entry = self.format(record)
 
@@ -60,6 +61,7 @@ class NewRelicLogHandler(logging.Handler):
             "name": record.name,
             "stack_info": record.stack_info,
             "logger.request": logger_request,
+            "logger.message": logger_message,
             "logger": json.dumps(logger_data),
             "request": parsed_request,
         }]

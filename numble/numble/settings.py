@@ -220,7 +220,7 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["console", "queue"],
+            "handlers": ["queue"],
         },
     },
 }

@@ -182,7 +182,8 @@ def signup_done_view(request):
         last_name=request.POST["lastname"],
     )
 
-    request_logger.info(f'New user created', extra={'request': request})
+    logger_message = 'New user created'
+    request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
 
     if user is not None:
         login(request, user)
@@ -234,7 +235,8 @@ def login_done_view(request):
             },
         )
 
-    request_logger.info(f'New user login', extra={'request': request})
+    logger_message = 'New user login'
+    request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
     return HttpResponseRedirect(next_page)
 
 
@@ -345,7 +347,8 @@ def game_view(request, game_mode):
     
         game.save()
 
-        request_logger.info(f'{game.game_mode} game lost', extra={'request': request})
+        logger_message = f'{game.game_mode} game lost'
+        request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
 
         # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
 
@@ -373,7 +376,8 @@ def game_by_id_view(request, game_mode, game_id):
         can_current_request_user_play = False
         game.save()
 
-        request_logger.info(f'{game.game_mode} game lost', extra={'request': request})
+        logger_message = f'{game.game_mode} game lost'
+        request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
     
     tries = []
     last_try = '0000'
@@ -415,41 +419,45 @@ def game_won_options(game: Game, user: User, game_mode: str, request):
 
         if streak == None:
             streak = Streak.objects.create_streak(user=user)
-            request_logger.info('player has no streak '+str({
+            logger_message = 'player has no streak '+str({
                 "user": str(user),
                 "streak": streak.streak,
                 "streak.date": str(streak.date),
                 "current date": str(timezone.now().date())
-            }), extra={'request': request})
+            })
+            request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
             return
 
         if streak.date == timezone.now().date():
-            request_logger.info('player has extended their streak '+str({
+            logger_message = 'player has extended their streak '+str({
                 "user": str(user),
                 "streak": streak.streak,
                 "streak.date": str(streak.date),
                 "current date": str(timezone.now().date())
-            }), extra={'request': request})
+            })
+            request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
             streak.date = timezone.now().date() + timezone.timedelta(days=1)
             streak.streak = F("streak") + 1
             streak.save()
             return
 
         if streak.date - timezone.timedelta(days=1) >= timezone.now().date():
-            request_logger.info('no action, player already has a streak for today '+str({
+            logger_message = 'no action, player already has a streak for today '+str({
                 "user": str(user),
                 "streak": streak.streak,
                 "streak.date": str(streak.date),
                 "current date": str(timezone.now().date())
-            }), extra={'request': request})
+            })
+            request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
             return
         
-        request_logger.info('reset streak to 1 '+str({
+        logger_message = 'reset streak to 1 '+str({
             "user": str(user),
             "streak": streak.streak,
             "streak.date": str(streak.date),
             "current date": str(timezone.now())
-        }), extra={'request': request})
+        })
+        request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
         streak.date = timezone.now() + timezone.timedelta(days=1)
         streak.streak = 1
         streak.save()
@@ -533,7 +541,8 @@ def game_forfeit_view(request, game_mode, game_id):
 
     game.save()
 
-    request_logger.info(f'{game.game_mode} game lost', extra={'request': request})
+    logger_message = f'{game.game_mode} game lost'
+    request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
 
     # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
     return htmx_game_submit(request, game)
@@ -592,7 +601,8 @@ def game_submit_view(request, game_mode, game_id):
     
         game.save()
 
-        request_logger.info(f'{game.game_mode} game lost', extra={'request': request})
+        logger_message = f'{game.game_mode} game lost'
+        request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
 
         # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
         return htmx_game_submit(request, game)
@@ -627,10 +637,12 @@ def game_submit_view(request, game_mode, game_id):
         if game.number == new_number_try:
             game.game_won = True
             game_won_options(game, user, game_mode, request)
-            request_logger.info(f'{game.game_mode} game won', extra={'request': request})
+            logger_message = f'{game.game_mode} game won'
+            request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
         else:
             game.lose_reason = 'No more tries left'
-            request_logger.info(f'{game.game_mode} game lost', extra={'request': request})
+            logger_message = f'{game.game_mode} game lost'
+            request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
     
     game.save()
 
@@ -875,22 +887,24 @@ def send_reset_password_email(email, username, token, request):
         data=json.dumps(payload)
     )
 
-    # Print response
+    # log response
     if response.status_code == 200:
-        request_logger.info(f'password reset email requested, {response.status_code} '+str({
+        logger_message = f'password reset email requested, {response.status_code} '+str({
             "user": str(username),
             "email": email,
             "response": response.json(),
             "payload": json.dumps(payload)
-        }), extra={'request': request})
+        })
+        request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
         return True
     else:
-        request_logger.warn(f'password reset email requested, {response.status_code} '+str({
+        logger_message = f'password reset email requested, {response.status_code} '+str({
             "user": str(username),
             "email": email,
             "response": response.json(),
             "payload": json.dumps(payload)
-        }), extra={'request': request})
+        })
+        request_logger.warn(logger_message, extra={'request': request, "logger_message": logger_message})
         return False
     
 
