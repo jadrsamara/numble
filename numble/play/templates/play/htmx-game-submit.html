@@ -94,8 +94,15 @@
     </script>
 
     <p id="content"><strong>Game Stats:</strong></p>
-    <span class="half-btn blue no-bg-color" data-bs-toggle="tooltip" data-bs-placement="top" 
+    {% if game.user.username != 'Anonymous' %}
+    <a href="{% url 'play:user_profile' game.user.username %}"><span class="half-btn blue no-bg-color" 
+        data-bs-toggle="tooltip" data-bs-placement="top" 
+        title="{{ game.user.first_name }} {{ game.user.last_name }}">👤 {{ game.user.username }}</a></span>
+    {% else %}
+    <span class="half-btn blue no-bg-color" 
+        data-bs-toggle="tooltip" data-bs-placement="top" 
         title="{{ game.user.first_name }} {{ game.user.last_name }}">👤 {{ game.user.username }}</span>
+    {% endif %}
     <span class="half-btn blue
                 {% if game.game_mode == 'easy' %}green{% endif %}
                 {% if game.game_mode == 'medium' %}orange{% endif %}
