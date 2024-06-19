@@ -43,9 +43,6 @@ request_logger = logging.getLogger("django")
 
 
 def index(request):
-
-    request_logger.warn(f'test log', extra={'request': request})
-
     return render(
         request,
         base_template,
@@ -345,6 +342,8 @@ def game_view(request, game_mode):
     
         game.save()
 
+        request_logger.info(f'{game.game_mode} game lost', extra={'request': request})
+
         # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
 
 
@@ -370,6 +369,8 @@ def game_by_id_view(request, game_mode, game_id):
         game.lose_reason = 'Timed out'
         can_current_request_user_play = False
         game.save()
+
+        request_logger.info(f'{game.game_mode} game lost', extra={'request': request})
     
     tries = []
     last_try = '0000'
@@ -529,6 +530,8 @@ def game_forfeit_view(request, game_mode, game_id):
 
     game.save()
 
+    request_logger.info(f'{game.game_mode} game lost', extra={'request': request})
+
     # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
     return htmx_game_submit(request, game)
 
@@ -586,6 +589,8 @@ def game_submit_view(request, game_mode, game_id):
     
         game.save()
 
+        request_logger.info(f'{game.game_mode} game lost', extra={'request': request})
+
         # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
         return htmx_game_submit(request, game)
 
@@ -619,8 +624,10 @@ def game_submit_view(request, game_mode, game_id):
         if game.number == new_number_try:
             game.game_won = True
             game_won_options(game, user, game_mode, request)
+            request_logger.info(f'{game.game_mode} game won', extra={'request': request})
         else:
             game.lose_reason = 'No more tries left'
+            request_logger.info(f'{game.game_mode} game lost', extra={'request': request})
     
     game.save()
 
