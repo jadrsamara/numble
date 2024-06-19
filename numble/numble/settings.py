@@ -14,6 +14,10 @@ import os
 from pathlib import Path
 from custom_log_handler import NewRelicLogHandler
 import oracledb
+import logging
+import logging.config
+import logging.handlers
+from queue import Queue
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -152,6 +156,25 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Logging
 
+# Create a queue
+log_queue = Queue(-1)
+
+# Define a handler that uses the queue
+queue_handler = logging.handlers.QueueHandler(log_queue)
+
+# Set up the queue listener with your handlers
+queue_listener = logging.handlers.QueueListener(
+    log_queue,
+    logging.StreamHandler(),  
+    NewRelicLogHandler(
+        api_key=os.environ['NEW_RELIC_API_KEY'], 
+        log_api_url=os.environ['NEW_RELIC_LOG_API_URL']
+    )
+)
+
+# Start the queue listener
+queue_listener.start()
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -187,11 +210,17 @@ LOGGING = {
             'formatter': 'simple',
             'api_key': os.environ['NEW_RELIC_API_KEY'],
             'log_api_url': os.environ['NEW_RELIC_LOG_API_URL'],
-        }
+        },
+        'queue': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.QueueHandler',
+            'formatter': 'simple',
+            'queue': log_queue,
+        },
     },
     "loggers": {
         "django": {
-            "handlers": ["console", "new_relic"],
+            "handlers": ["console", "queue"],
         },
     },
 }
