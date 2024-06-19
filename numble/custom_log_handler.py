@@ -34,14 +34,14 @@ class NewRelicLogHandler(logging.Handler):
 
         if is_request_log != True and request != {} and is_wsgi_request:
             parsed_request = {
-                "request_method": request.method,
-                "request_body": request.POST.dict(),
-                "request_url": request.build_absolute_uri(),
-                "request_path": request.get_full_path(),
+                "method": request.method,
+                "body": request.POST.dict(),
+                "url": request.build_absolute_uri(),
+                "path": request.get_full_path(),
                 "request": f"'{request.method} {request.get_full_path()}'",
-                "request_cookies": request.COOKIES,
-                "request_content_type": request.content_type,
-                "request.user": str(request.user),
+                "cookies": request.COOKIES,
+                "content_type": request.content_type,
+                "user": str(request.user),
             }
             logger_request = f"'{request.method} {request.get_full_path()}'"
 

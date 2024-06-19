@@ -28,13 +28,13 @@ class RequestLogMiddleware:
             response.reason_phrase = 'Internal Server Error'
 
         parsed_request = {
-            "request_method": request.method,
-            "request_body": request.POST.dict(),
-            "request_url": request.build_absolute_uri(),
-            "request_path": request.get_full_path(),
-            "request_cookies": request.COOKIES,
-            "request_content_type": request.content_type,
-            "request.user": str(request.user),
+            "method": request.method,
+            "body": request.POST.dict(),
+            "url": request.build_absolute_uri(),
+            "path": request.get_full_path(),
+            "cookies": request.COOKIES,
+            "content_type": request.content_type,
+            "user": str(request.user),
         }
 
         log_data = {

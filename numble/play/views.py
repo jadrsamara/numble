@@ -182,6 +182,8 @@ def signup_done_view(request):
         last_name=request.POST["lastname"],
     )
 
+    request_logger.info(f'New user created', extra={'request': request})
+
     if user is not None:
         login(request, user)
         return HttpResponseRedirect(reverse(base_reverse))
@@ -232,6 +234,7 @@ def login_done_view(request):
             },
         )
 
+    request_logger.info(f'New user login', extra={'request': request})
     return HttpResponseRedirect(next_page)
 
 

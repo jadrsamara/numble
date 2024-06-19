@@ -53,6 +53,10 @@
         <input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1" class="btn_ yellow row-item"
             value="{% get_value_1d game.number i %}" disabled>
         {% endfor %}
+        <div class="vertical-line" style="visibility: hidden;"></div>
+        <b class="try-result-text" style="visibility: hidden;">
+            <span>{{ game_mode_len }} wrong</span>
+        </b>
     </div>
     <br>
     <audio id="audio">
