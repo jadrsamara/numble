@@ -3,9 +3,6 @@ import logging
 import requests
 import json
 import gzip
-import threading
-import queue
-import newrelic.agent
 
 from io import BytesIO
 
@@ -22,13 +19,31 @@ class NewRelicLogHandler(logging.Handler):
 
     def emit(self, record):
 
+        parsed_request = getattr(record, 'parsed_request', {})
+        request = getattr(record, 'request', {})
+        logger_data = getattr(record, 'log_data', {})
+        is_request_log = getattr(record, 'request_log', {})
+
         log_entry = self.format(record)
-        msg_logger = log_entry.split('&')
-        log_entry = msg_logger[0] 
-        try:
-            logger = json.loads(msg_logger[1])
-        except IndexError:
-            logger = ''
+
+        is_wsgi_request = False
+        if str(type(request)).__contains__('wsgi'):
+            is_wsgi_request = True
+
+        logger_request = None
+
+        if is_request_log != True and request != {} and is_wsgi_request:
+            parsed_request = {
+                "request_method": request.method,
+                "request_body": request.POST.dict(),
+                "request_url": request.build_absolute_uri(),
+                "request_path": request.get_full_path(),
+                "request": f"'{request.method} {request.get_full_path()}'",
+                "request_cookies": request.COOKIES,
+                "request_content_type": request.content_type,
+                "request.user": str(request.user),
+            }
+            logger_request = f"'{request.method} {request.get_full_path()}'"
 
         log_data = [{
             "application": os.environ["NEW_RELIC_APP_NAME"],
@@ -44,7 +59,9 @@ class NewRelicLogHandler(logging.Handler):
             "msg": log_entry,
             "name": record.name,
             "stack_info": record.stack_info,
-            "logger": logger,
+            "logger.request": logger_request,
+            "logger": json.dumps(logger_data),
+            "request": parsed_request,
         }]
 
         log_data_json = json.dumps(log_data)

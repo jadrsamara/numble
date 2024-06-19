@@ -26,43 +26,38 @@ class RequestLogMiddleware:
         except AttributeError:
             response.status_code = 500
             response.reason_phrase = 'Internal Server Error'
-        
-        log_data = {
-            "remote_address": request.META.get("REMOTE_ADDR", ''),
-            "server_hostname": socket.gethostname(),
+
+        parsed_request = {
             "request_method": request.method,
             "request_body": request.POST.dict(),
             "request_url": request.build_absolute_uri(),
             "request_path": request.get_full_path(),
-            "request": f"'{request.method} {request.get_full_path()}' {response.status_code} {response.reason_phrase}",
-            "response.status_code": response.status_code,
-            "response.reason_phrase": response.reason_phrase,
             "request_cookies": request.COOKIES,
             "request_content_type": request.content_type,
-            "session.id": request.COOKIES.get("sessionid", '-'),
             "request.user": str(request.user),
-            # "request_server_protocol": request.META.get("SERVER_PROTOCOL", ''),
-            # "request_user_agent": request.META.get("HTTP_USER_AGENT", ''),
+        }
+
+        log_data = {
+            "remote_address": request.META.get("REMOTE_ADDR", ''),
+            "server_hostname": socket.gethostname(),
+            "response.status_code": response.status_code,
+            "response.reason_phrase": response.reason_phrase,
+            "session.id": request.COOKIES.get("sessionid", '-'),
             "url_scheme": request.META.get("wsgi.url_scheme", ''),
-            # "X-Real-IP": request.META.get("X-Real-IP".upper().replace('-', '_'), '-'),
-            # "X-Forwarded-Proto": request.META.get("X-Forwarded-Proto".upper().replace('-', '_'), '-'),
-            # "X-Forwarded-Host": request.META.get("X-Forwarded-Host".upper().replace('-', '_'), '-'),
-            # "X-Forwarded-For": request.META.get("X-Forwarded-For".upper().replace('-', '_'), '-'),
-            # "Referer": request.META.get("Referer".upper().replace('-', '_'), '-'),
-            # "Host": request.META.get("Host".upper().replace('-', '_'), '-'),
-            # "META": str(request.META),
+            "request": f"'{request.method} {request.get_full_path()}' {response.status_code} {response.reason_phrase}",
         }
 
         for http_header in request.META.keys():
             if http_header.lower().startswith('http'):
-                log_data[http_header] = request.META.get(http_header)
+                parsed_request[http_header] = request.META.get(http_header)
 
+        parsed_request['client.ip'] = request.META.get('HTTP_X_FORWARDED_FOR', '-, -').split(', ')[0]
         log_data['logger.client.ip'] = request.META.get('HTTP_X_FORWARDED_FOR', '-, -').split(', ')[0]
 
         # Only logging "*/api/*" patterns
         if "/api/" in str(request.get_full_path()):
             req_body = json.loads(request.body.decode("utf-8")) if request.body else {}
-            log_data["request_body"] = req_body
+            parsed_request["request_body"] = req_body
 
         # add runtime to our log_data
         try:
@@ -73,7 +68,8 @@ class RequestLogMiddleware:
         except TypeError:
             log_data["run_time"] = 'no response'
 
-        request_logger.info(msg=log_data["request"]+'&'+json.dumps(log_data))
+        # request_logger.info(msg=log_data["request"]+'&'+json.dumps(log_data))
+        request_logger.info(msg=log_data["request"], extra={'parsed_request': parsed_request, 'log_data': log_data, 'request_log': True})
 
         return response
 

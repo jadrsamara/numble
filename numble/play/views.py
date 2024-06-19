@@ -43,6 +43,9 @@ request_logger = logging.getLogger("django")
 
 
 def index(request):
+
+    request_logger.warn(f'test log', extra={'request': request})
+
     return render(
         request,
         base_template,
@@ -398,7 +401,7 @@ def game_by_id_view(request, game_mode, game_id):
     )
 
 
-def game_won_options(game: Game, user: User, game_mode: str):
+def game_won_options(game: Game, user: User, game_mode: str, request):
     
     if user.username == 'Anonymous':
         return
@@ -413,7 +416,7 @@ def game_won_options(game: Game, user: User, game_mode: str):
                 "streak": streak.streak,
                 "streak.date": str(streak.date),
                 "current date": str(timezone.now().date())
-            }))
+            }), extra={'request': request})
             return
 
         if streak.date == timezone.now().date():
@@ -422,7 +425,7 @@ def game_won_options(game: Game, user: User, game_mode: str):
                 "streak": streak.streak,
                 "streak.date": str(streak.date),
                 "current date": str(timezone.now().date())
-            }))
+            }), extra={'request': request})
             streak.date = timezone.now().date() + timezone.timedelta(days=1)
             streak.streak = F("streak") + 1
             streak.save()
@@ -434,7 +437,7 @@ def game_won_options(game: Game, user: User, game_mode: str):
                 "streak": streak.streak,
                 "streak.date": str(streak.date),
                 "current date": str(timezone.now().date())
-            }))
+            }), extra={'request': request})
             return
         
         request_logger.info('reset streak to 1 '+str({
@@ -442,7 +445,7 @@ def game_won_options(game: Game, user: User, game_mode: str):
             "streak": streak.streak,
             "streak.date": str(streak.date),
             "current date": str(timezone.now())
-        }))
+        }), extra={'request': request})
         streak.date = timezone.now() + timezone.timedelta(days=1)
         streak.streak = 1
         streak.save()
@@ -615,7 +618,7 @@ def game_submit_view(request, game_mode, game_id):
 
         if game.number == new_number_try:
             game.game_won = True
-            game_won_options(game, user, game_mode)
+            game_won_options(game, user, game_mode, request)
         else:
             game.lose_reason = 'No more tries left'
     
@@ -774,14 +777,14 @@ def send_reset_password_email_if_eligible(request):
         user = list(username)[0]
     
     if user:
-        success = generate_new_token_and_send_reset_email(user)
+        success = generate_new_token_and_send_reset_email(user, request)
         if not success:
             return "Error: something went wrong, please try again later"
 
     return False
 
 
-def generate_new_token_and_send_reset_email(user):
+def generate_new_token_and_send_reset_email(user, request):
 
     reset_password = ResetPassword.objects.filter(user=user).first()
 
@@ -805,10 +808,10 @@ def generate_new_token_and_send_reset_email(user):
     
     reset_password.save()
     
-    return send_reset_password_email(user.email, user.username, reset_password.token)
+    return send_reset_password_email(user.email, user.username, reset_password.token, request)
 
 
-def send_reset_password_email(email, username, token):
+def send_reset_password_email(email, username, token, request):
     api_key = os.environ['MJ_APIKEY_PUBLIC']
     api_secret = os.environ['MJ_APIKEY_PRIVATE']
 
@@ -869,7 +872,7 @@ def send_reset_password_email(email, username, token):
             "email": email,
             "response": response.json(),
             "payload": json.dumps(payload)
-        }))
+        }), extra={'request': request})
         return True
     else:
         request_logger.warn(f'password reset email requested, {response.status_code} '+str({
@@ -877,7 +880,7 @@ def send_reset_password_email(email, username, token):
             "email": email,
             "response": response.json(),
             "payload": json.dumps(payload)
-        }))
+        }), extra={'request': request})
         return False
     
 
