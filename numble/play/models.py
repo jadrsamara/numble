@@ -17,6 +17,20 @@ class GameManager(models.Manager):
             expire_date = (timezone.now() + timezone.timedelta(minutes=expire_duration)).date(),
         )
         return game
+    
+    def create_2d_game(self, user, game_mode, number, number2, pivot, expire_duration):
+        game = self.create(
+            user = user,
+            game_mode = game_mode,
+            number = number,
+            number2 = number2,
+            pivot = pivot,
+            date = timezone.now().date(),
+            start_time = timezone.now(),
+            expire_time = timezone.now() + timezone.timedelta(minutes=expire_duration),
+            expire_date = (timezone.now() + timezone.timedelta(minutes=expire_duration)).date(),
+        )
+        return game
 
 
 class Game(models.Model):
@@ -45,9 +59,12 @@ class Game(models.Model):
     )
     game_completed = models.BooleanField(default=False)
     number = models.CharField(max_length=10)
+    number2 = models.CharField(max_length=10, null=True)
+    pivot = models.IntegerField(null=True)
     tries = models.JSONField(default=dict)
+    tries2 = models.JSONField(default=dict, null=True)
     game_won = models.BooleanField(default=False)
-    lose_reason = models.CharField(null=True, max_length=256)
+    lose_reason = models.CharField(blank=True, null=True, max_length=256)
 
     objects = GameManager()
 

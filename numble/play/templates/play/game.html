@@ -29,6 +29,17 @@
     <h3>Can you guess the {{ game_mode_len }}-digit number in {{ GAME_TRIES_LIMIT }} tries?</h3>
     {% endif %}
 
+
+    <p>The color of the tiles will change to show how close your guess was to the number.</p>
+    <ul>
+        <li><span style="color: #e67e22; font-weight: bold;">Orange</span>: correct but in the wrong
+            spot.</li>
+        <li><span style="color: #2ecc71; font-weight: bold;">Green</span>: correct and in the correct
+            spot.</li>
+    </ul>
+    <p>Note: there is no number repetition.</p>
+
+
     <div id="parent-div">
     {% for i in game_tries_range %}
     <div class="numbers-row">
@@ -119,9 +130,9 @@
     <br><br>
 
     {% if game.user.username == 'Tutorial' %}
-    <strong><a id="newgame" href="{% url 'play:game_view' game.game_mode %}" autofocus>Start a new game</a></strong>
+    <strong><a id="newgame" href="{% url 'play:play_view' %}" autofocus>Start a new game</a></strong>
     {% else %}
-    <strong><a id="newgame" href="{% url 'play:game_view' game.game_mode %}" autofocus>Play again?</a></strong>
+    <strong><a id="newgame" href="{% url 'play:play_view' %}" autofocus>Play again?</a></strong>
     {% endif %}
 
     <script>

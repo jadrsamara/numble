@@ -2,48 +2,55 @@
 {% load custom_template_tags %}
 
 <div id="parent-div">
-    {% for i in game_tries_range %}
-    <div class="border-top border-2 mt-2">Try #{% increment i %}:</div>
-    <div class="numbers-row">
-        {% for j in game_mode_range %}
-        {% get_value_1d game_last_try j as game_last_try_digit %}
-        {% get_value_2d game_tries i j as current_try_digit %}
-        {% increment i as incremented_by_one %}
-        {% if incremented_by_one == game.number_of_tries and game.game_completed == True and game.game_won == True and current_try_digit == game_last_try_digit %}
-        <button type="number" class="btn_ green row-item center-logo">{% get_value_2d game_tries i j %}</button>
-        {% else %}
-        <button type="number" class="btn_ gray row-item center-logo">{% get_value_2d game_tries i j %}</button>
-        {% endif %}
-        {% endfor %}
-        {% get_blind game i as blind_try_result %}
-        {% if blind_try_result.correct != 0 %}
-        <div class="vertical-line green-border"></div>
-        {% elif blind_try_result.partial != 0 %}
-        <div class="vertical-line orange-border"></div>
-        {% else %}
-        <div class="vertical-line"></div>
-        {% endif %}
-        <b class="try-result-text">
-            {% if blind_try_result.partial == 0 and blind_try_result.correct == 0 %}
-            <span>{{ game_mode_len }} wrong</span>
-            {% endif %}
-            {% if blind_try_result.partial != 0 %}
-            <span class="orange-text">{{ blind_try_result.partial }} partial</span>
-            {% endif %}
-            {% if blind_try_result.correct != 0 %}
-            <span class="green-text">{{ blind_try_result.correct }} correct</span>
-            {% endif %}
-        </b>
-    </div>
-    {% endfor %}
-
     <script>
         document.getElementById('input_cell0').value = '';
         document.getElementById('input_cell1').value = '';
         document.getElementById('input_cell2').value = '';
         document.getElementById('input_cell3').value = '';
+        try {
+            document.getElementById('input_cell2_0').value = '';
+        } catch (error) {}
+        try {
+            document.getElementById('input_cell2_1').value = '';
+        } catch (error) {}
+        try {
+            document.getElementById('input_cell2_2').value = '';
+        } catch (error) {}
+        try {
+            document.getElementById('input_cell2_3').value = '';
+        } catch (error) {}
         document.getElementById("input_cell0").focus()
     </script>
+
+
+    {% for game_try in game_tries_range %}
+    {% get_value_1d game_tries game_try as game_try_1 %}
+    {% get_value_1d game_tries2 game_try as game_try_2 %}
+    <p class="border-top border-2 mt-4">Try #{% increment game_try %}:</p>
+    {% for i in game_mode_range %}
+    <div class="numbers-row">
+        {% if i == game.pivot %}
+            {% for j in game_mode_range %}
+                {% if j == game.pivot %}
+                <button type="number" class="btn_ {% get_color_by_numbers game.number game.number2 game_try_1 j %} row-item center-logo">{% get_value_1d game_try_1 j %}</button>
+                {% else %}
+                <button type="number" class="btn_ {% get_color_by_number game.number game_try_1 j %} row-item center-logo">{% get_value_1d game_try_1 j %}</button>
+                {% endif %}
+            {% endfor %}
+
+        {% else %}
+            {% for j in game_mode_range %}
+                {% if j == game.pivot %}
+                <button type="number" class="btn_ {% get_color_by_number game.number2 game_try_2 i %} row-item center-logo">{% get_value_1d game_try_2 i %}</button>
+                {% else %}
+                <button type="number" class="btn_ gray row-item center-logo" style="visibility: hidden;">-</button>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% endfor %}
+
 
     {% if game.game_completed %}
     <br>
@@ -54,10 +61,6 @@
         <input type="number" id="cell{{i}}{{j}}" name="cell{{i}}{{j}}" maxlength="1" class="btn_ yellow row-item"
             value="{% get_value_1d game.number i %}" disabled>
         {% endfor %}
-        <div class="vertical-line" style="visibility: hidden;"></div>
-        <b class="try-result-text" style="visibility: hidden;">
-            <span>{{ game_mode_len }} wrong</span>
-        </b>
     </div>
     <br>
     <audio id="audio">
@@ -87,10 +90,8 @@
     {% endif %}
 
     <script>
-        var targetDivId = 'content';
         var userInputDivId = 'user-input'
         var forfeitDivId = 'forfeit'
-        var audio = document.getElementById('audio');
         
         var userInputDiv = document.getElementById(userInputDivId);
         if (userInputDiv) {
@@ -100,6 +101,10 @@
         if (forfeitDiv) {
             forfeitDiv.style.display = 'none';
         }
+        
+
+        var targetDivId = 'content';
+        var audio = document.getElementById('audio');
 
         document.body.addEventListener('htmx:afterSwap', function(event) {
             var targetDiv = document.getElementById(targetDivId);

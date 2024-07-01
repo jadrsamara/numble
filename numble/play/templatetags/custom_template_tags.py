@@ -48,6 +48,43 @@ def get_color(game, i, j):
     
 
 @register.simple_tag
+def get_color_by_number(number, try_number, j):
+    try:
+        if number[j] == try_number[j]:
+            return 'green'
+        elif try_number[j] in number:
+            return 'orange'
+        return 'gray'
+    except:
+        return None
+    
+
+@register.simple_tag
+def get_color_by_numbers(number, number2, try_number, j):
+    try:
+        if number[j] == try_number[j] or number2[j] == try_number[j]:
+            return 'green'
+        elif try_number[j] in number or try_number[j] in number2:
+            return 'orange'
+        return 'gray'
+    except:
+        return None
+    
+    
+@register.simple_tag
+def get_2d_color(game, i, j):
+    try:
+        i += 1
+        if game.tries2[f"try{i}"][j] == game.number2[j]:
+            return 'green'
+        elif game.tries2[f"try{i}"][j] in game.number2:
+            return 'orange'
+        return 'gray'
+    except:
+        return None
+    
+
+@register.simple_tag
 def get_value_1d(l, i):
     try:
         return l[i]

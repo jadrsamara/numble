@@ -6,7 +6,7 @@
 <div class="wrapper">
     <div class="wrapped">
 
-        <section class="p-4 mb-4 rounded">
+        <!-- <section class="p-4 mb-4 rounded">
             <h1 class="mb-4">Select Game Mode</h1>
 
             <h2>Normal Modes</h2>
@@ -23,6 +23,12 @@
                 <p><a class="btn_ yellow menu-item" href="{% url 'play:game_view' 'blind' %}">Blind</a></p>
             </div>
 
+            <h2>2 Dimensional Mode</h2>
+            <p>Test your skills and solve 2 numbers at the same time.</p>
+            <div class="d-flex align-items-center justify-content-center flex-row menu">
+                <p><a class="btn_ blue menu-item" href="{% url 'play:game_view' '2d' %}">2d</a></p>
+            </div>
+
             <h2>Daily Challenge</h2>
             <p>Compete against the clock with new puzzles daily.</p>
             <div class="d-flex align-items-center justify-content-center flex-row menu">
@@ -33,7 +39,93 @@
                 <p>Hint: Play every day to get your streak!</p>
             </div>
 
-        </section>
+        </section> -->
+
+        <section class="wrapper">
+            <div class="container">
+
+              <div class="row">
+                <div class="col text-center mb-5">
+                  <h1 class="display-4 font-weight-bolder">Choose Game Mode</h1>
+                  <p class="lead">Game modes vary based on difficulty</p>
+                </div>
+              </div>
+
+              <div class="row">
+
+                <div class="col-sm-12 col-md-6 col-lg-4 mb-4">
+                  <div class="card text-dark card-has-bg click-col">
+                    <div class="card-img-overlay d-flex flex-column">
+                      <div class="card-body">
+                        <small class="card-meta mb-2">Visually based</small>
+                        <h4 class="card-title mt-0 ">Normal Mode</h4>
+                        <small><i class="far fa-clock"></i> Easy</small>
+                    
+                        <br><br>
+                        <p>Select which normal mode to play:</p>
+                        <div>
+                            <a class="btn_ green menu-item" href="{% url 'play:game_view' 'easy' %}">Easy</a>
+                            <a class="btn_ orange menu-item" href="{% url 'play:game_view' 'medium' %}">Medium</a>
+                            <a class="btn_ red menu-item" href="{% url 'play:game_view' 'hard' %}">Hard</a>
+                            <a class="btn_ blue menu-item" href="{% url 'play:game_view' 'daily' %}">Daily</a>
+                        </div>
+                    
+                    </div>
+                      <div class="card-footer">
+                        <p>Guess 1 number from visual hints</p>
+                        <h5>4 - 6 Digits</h5>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-sm-12 col-md-6 col-lg-4 mb-4">
+                    <div class="card text-dark card-has-bg click-col">
+                      <div class="card-img-overlay d-flex flex-column level-orange-card">
+                        <div class="card-body">
+                          <small class="card-meta mb-2">Visually based</small>
+                          <h4 class="card-title mt-0 ">Two Dimensional Mode</h4>
+                          <small><i class="far fa-clock"></i> Medium</small>
+
+                          <br><br><br>
+                          <div>
+                              <a class="btn_ black menu-item" href="{% url 'play:game_view' '2d' %}">Start a 2D Game</a>
+                          </div>
+
+                        </div>
+                        <div class="card-footer">
+                          <p>Guess 2 intercepted numbers</p>
+                          <h5>4 Digits</h5>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-12 col-md-6 col-lg-4 mb-4">
+                    <div class="card text-dark card-has-bg click-col">
+                      <div class="card-img-overlay d-flex flex-column level-red-card">
+                        <div class="card-body">
+                          <small class="card-meta mb-2">Text based</small>
+                          <h4 class="card-title mt-0 ">Blind Mode</h4>
+                          <small><i class="far fa-clock"></i> Hard</small>
+
+                          <br><br><br>
+                          <div>
+                              <a class="btn_ black menu-item" href="{% url 'play:game_view' 'blind' %}">Start a Blind Game</a>
+                          </div>
+
+                        </div>
+                        <div class="card-footer">
+                          <p>Guess 1 number from text hints</p>
+                          <h5>4 Digits</h5>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+              </div>
+            </div>
+          </section>
 
     </div>
 </div>

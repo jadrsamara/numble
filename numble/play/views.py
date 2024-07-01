@@ -31,9 +31,10 @@ GAME_TRIES_LIMIT = {
     'daily': 7, 
     'blind': 12, 
     '1v1': 7,
+    '2d': 7,
 }
 GAME_TIMEOUT = 15
-game_modes = ['easy', 'medium', 'hard', 'daily', 'blind']
+game_modes = ['easy', 'medium', 'hard', 'daily', 'blind', '2d']
 
 
 request_logger = logging.getLogger("django")
@@ -269,7 +270,7 @@ def generate_numbers_by_seed(seed, number_of_digits):
 
 def get_a_new_game_number(game_mode, request):
     number_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
-    if game_mode in ['easy', 'blind']:
+    if game_mode in ['easy', 'blind', '2d']:
         game_number = random.sample(number_pool, 4)
         return ''.join(str(num) for num in game_number)
     if game_mode == 'medium':
@@ -284,6 +285,19 @@ def get_a_new_game_number(game_mode, request):
     if game_mode == 'daily' and not request.user.is_anonymous:
         game_number = random.sample(number_pool, 4)
         return ''.join(str(num) for num in game_number)
+    
+
+def get_2d_game_number2(number):
+    number_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+    pivot_point_values = list(range(4))
+    pivot_point = random.sample(pivot_point_values, 1)[0]
+    print(number)
+    print(pivot_point)
+    pivoted_num = int(number[pivot_point])
+    number_pool.remove(pivoted_num)
+    number2 = random.sample(number_pool, 3)
+    number2.insert(pivot_point, pivoted_num)
+    return ''.join(str(num) for num in number2) , pivot_point
 
 
 def get_user_from_request(request) -> User:
@@ -322,6 +336,22 @@ def game_view(request, game_mode):
     if game_mode == 'daily' and not request.user.is_anonymous:
         game = Game.objects.filter(user=user, date=timezone.now().date(), game_mode=game_mode).first()
 
+    if game_mode == '2d' and game == None:
+
+        number1 = get_a_new_game_number(game_mode, request)
+        print(number1)
+        number2, pivot = get_2d_game_number2(number1)
+
+        if game_mode == '2d':
+            game = Game.objects.create_2d_game(
+            user = user,
+            game_mode = game_mode, 
+            number = number1,
+            number2 = number2,
+            pivot = pivot,
+            expire_duration = GAME_TIMEOUT,
+        )
+                
     if game == None:
         game = Game.objects.create_game(
             user = user,
@@ -380,7 +410,7 @@ def game_by_id_view(request, game_mode, game_id):
         request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
     
     tries = []
-    last_try = '0000'
+    last_try = None
     for i in range(1, GAME_TRIES_LIMIT[game_mode] + 1):
         game_try = game.tries.get(f"try{i}")
         if game_try is None:
@@ -388,8 +418,20 @@ def game_by_id_view(request, game_mode, game_id):
         tries.append(game_try)
         last_try = game_try
 
+    tries2 = []
+    last_try2 = None
+    if game.tries2 is not None:
+        for i in range(1, GAME_TRIES_LIMIT[game_mode] + 1):
+            game_try2 = game.tries2.get(f"try{i}")
+            if game_try2 is None:
+                break
+            tries2.append(game_try2)
+            last_try2 = game_try2
+
     if game_mode == 'blind':
         template_name = "play/game_blind.html"
+    elif game_mode == '2d':
+        template_name = "play/game_2d.html"
     else:
         template_name = "play/game.html"
 
@@ -398,8 +440,10 @@ def game_by_id_view(request, game_mode, game_id):
         template_name,
         {
             "game_tries": tries,
+            "game_tries2": tries2,
             "game_tries_range": range(len(tries)),
             "game_last_try": last_try,
+            "game_last_try2": last_try2,
             "game_mode_range": range(len(get_a_new_game_number(game_mode, request))),
             "game_mode_len": len(get_a_new_game_number(game_mode, request)),
             "GAME_TRIES_LIMIT": GAME_TRIES_LIMIT[game_mode],
@@ -559,8 +603,21 @@ def htmx_game_submit(request, game):
         tries.append(game_try)
         last_try = game_try
 
+    tries2 = []
+    last_try2 = None
+    if game.tries2 is not None:
+        for i in range(1, GAME_TRIES_LIMIT[game.game_mode] + 1):
+            game_try2 = game.tries2.get(f"try{i}")
+            if game_try2 is None:
+                break
+            tries2.append(game_try2)
+            last_try2 = game_try2
+
+
     if game.game_mode == 'blind':
         template_name = 'play/htmx-blind-game-submit.html'
+    elif game.game_mode == '2d':
+        template_name = 'play/htmx-game-2d-submit.html'
     else:
         template_name = 'play/htmx-game-submit.html'
 
@@ -569,10 +626,12 @@ def htmx_game_submit(request, game):
         template_name,
         {
             "game_tries": tries,
+            "game_tries2": tries2,
             "game_tries_range": range(len(game.tries)),
             "game_mode_range": range(len(game.number)),
             "game": game,
             "game_last_try": last_try,
+            "game_last_try2": last_try2,
         }
     )
 
@@ -601,7 +660,7 @@ def game_submit_view(request, game_mode, game_id):
     
         game.save()
 
-        logger_message = f'{game.game_mode} game lost'
+        logger_message = f'{game_mode} game lost'
         request_logger.info(logger_message, extra={'request': request, "logger_message": logger_message})
 
         # return HttpResponseRedirect(reverse("play:game_by_id_view", kwargs={"game_mode":game_mode, "game_id":game_id}))
@@ -626,7 +685,30 @@ def game_submit_view(request, game_mode, game_id):
     tries[f"try{number_of_tries}"] = new_number_try
     game.tries = tries
 
-    if number_of_tries >= GAME_TRIES_LIMIT[game_mode] or game.number == new_number_try:
+    if_2d_check_won = True
+    if game_mode == '2d':
+        new_number2_try = []
+        for i in range(len(get_a_new_game_number(game_mode, request))):
+            try:
+                cell = request.POST[f"input_cell2_{i}"]
+            except KeyError:
+                cell = request.POST[f"input_cell{i}"]
+            if not 2 > len(cell) > 0:
+                return HttpResponseServerError()
+            new_number2_try.append(cell)
+        
+        new_number2_try = ''.join(str(x) for x in new_number2_try)
+
+        tries2 = game.tries2
+
+        tries2[f"try{number_of_tries}"] = new_number2_try
+        game.tries2 = tries2
+
+        if not (game.number == new_number_try and game.number2 == new_number2_try):
+            if_2d_check_won = False
+
+
+    if number_of_tries >= GAME_TRIES_LIMIT[game_mode] or (game.number == new_number_try and if_2d_check_won):
         game.game_completed = True
         game.finish_time = timezone.now()
 

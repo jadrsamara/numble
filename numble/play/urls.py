@@ -13,6 +13,8 @@ urlpatterns = [
     path("about/", views.about_view, name="about_view"),
     path("switch_theme/", views.switch_theme_view, name="switch_theme_view"),
 
+    # path("test_view/", views.test_view, name="test_view"),
+
     # --- User paths ---
 
     # path("user/", views.user, name="user"), 
