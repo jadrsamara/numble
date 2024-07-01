@@ -1,4 +1,5 @@
 from django import template
+from django.utils import timezone
 
 from .. models import Game, Streak
 
@@ -139,7 +140,11 @@ def get_user_streaks(games, game_mode):
             if streak == None:
                 streak = 0
             else:
-                streak = streak.streak
+                now = timezone.now().date()
+                if now > streak.date:
+                    streak = 0 
+                else:
+                    streak = streak.streak
             users_dict[user] = streak
 
         total_games = Game.objects.filter(user=user, game_completed=True).count()
