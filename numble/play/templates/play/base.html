@@ -43,7 +43,6 @@
     <link rel="stylesheet" href="{% static 'play/css/style.css' %}?v=0.0.2">
     <link rel="stylesheet" href="{% static 'play/css/game.css' %}?v=0.0.3">
     <link rel="stylesheet" href="{% static 'play/css/profile.css' %}?v=0.0.1">
-    <link rel="stylesheet" href="{% static 'play/css/play.css' %}?v=0.0.1">
     <meta charset="utf-8">
     <meta name="description" content="Numble.One (نمبل) is a number guessing game like Wordle, offering normal play with visual hints, blind play, and daily challenges. Test your mind with visual cues and addictive gameplay!">
     <meta name="author" content="Jad Samara">
@@ -63,10 +62,13 @@
 
             <div class="navbar-collapse collapse justify-content-end" id="navbarToggleExternalContent">
                 <ul class="navbar-nav mr-auto">
-                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link blue me-2 ps-2 pe-2" style="box-shadow: none; color: aliceblue; border-radius: 10px;" href="{% url 'play:play_view' %}">Play</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'play:leaderboard_view' %}">Leaderboard</a>
                     </li>
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'play:user_profile' request.user.username %}">Account</a>
                     </li>
@@ -74,9 +76,6 @@
                         <a class="nav-link" href="{% url 'play:logout_view' %}">Log out</a>
                     </li>
                     {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'play:leaderboard_view' %}">Leaderboard</a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'play:signup_view' %}">Sign up</a>
                     </li>
