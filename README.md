@@ -18,6 +18,7 @@ Bellow is a sample game, trys were as follows:
  - Django
  - Gunicorn
  - Nginx
+ - Docker
  - Oracle Cloud (DB, Load Balancing, and Instance hosting)
  - Cloudflare (for DNS, Caching static files, and Security)
 
