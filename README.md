@@ -9,3 +9,17 @@ Bellow is a sample game, trys were as follows:
 
 
 ![image](https://github.com/jadrsamara/numble/assets/77105910/1655d661-f7d8-4df3-b2fa-392809fe43ce)
+
+---
+
+# Technical details
+
+🛠️ Tech stack: 
+ - Django
+ - Gunicorn
+ - Nginx
+ - Docker
+ - Oracle Cloud (DB, Load Balancing, and Instance hosting)
+ - Cloudflare (for DNS, Caching static files, and Security)
+
+🌐 the game is live at [numble.one](https://numble.one) 
