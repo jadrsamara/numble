@@ -20,6 +20,7 @@
         <li><span style="color: #2ecc71; font-weight: bold;">Green</span>: correct and in the correct
             spot.</li>
     </ul>
+    <p>Note: zero is included making your choices: 0-9.</p>
     <p>*Note: each number takes a different direction (vertical, horizontal).</p>
     <p>**Note: there is no digit repetition for each number (but the two numbers can have some matching digits).</p>
     
@@ -28,7 +29,7 @@
         {% for game_try in game_tries_range %}
         {% get_value_1d game_tries game_try as game_try_1 %}
         {% get_value_1d game_tries2 game_try as game_try_2 %}
-        <p class="border-top border-2 mt-4">Try #{% increment game_try %}:</p>
+        <p class="border-top border-2 mt-2">Try #{% increment game_try %}:</p>
         {% for i in game_mode_range %}
         <div class="numbers-row">
             {% if i == game.pivot %}
@@ -52,12 +53,15 @@
         </div>
         {% endfor %}
         {% endfor %}
+
+        {% if can_current_request_user_play %}
+        <div class="border-top border-2 mt-4">Please enter try #{% increment game.number_of_tries %}:</div>
+        {% endif %}
     </div>
 
 
     <div id="user-input">
         {% if can_current_request_user_play %}
-        <p class="border-top border-2 mt-5">Please enter your next try:</p>
         <form hx-post="{% url 'play:game_submit_view' game_mode=game.game_mode game_id=game.pk %}"
             hx-trigger="submit"
             hx-target="#parent-div">
@@ -67,18 +71,18 @@
                 {% if i == game.pivot %}
 
                 {% for j in game_mode_range %}
-                <input type="number" id="input_cell{{j}}" name="input_cell{{j}}" maxlength="1" class="btn_ white  row-item"
+                <input type="number" id="input_cell{{j}}" name="input_cell{{j}}" maxlength="1" class="btn_ white row-item user-input"
                     autofocus onfocus="this.select(); this.click();"
-                    oninput="javascript: if (this.value.length >= this.maxLength) {this.value = this.value.slice(0, this.maxLength); this.nextElementSibling.focus();}"
+                    oninput="javascript: if (this.value.length >= this.maxLength) {this.value = this.value.slice(0, this.maxLength); focusNextElement();}"
                     required>
                 {% endfor %}
                 {% else %}
 
                 {% for j in game_mode_range %}
                 {% if j == game.pivot %}
-                <input type="number" id="input_cell2_{{i}}" name="input_cell2_{{i}}" maxlength="1" class="btn_ white  row-item"
+                <input type="number" id="input_cell2_{{i}}" name="input_cell2_{{i}}" maxlength="1" class="btn_ white row-item user-input-vertical"
                     autofocus onfocus="this.select(); this.click();"
-                    oninput="javascript: if (this.value.length >= this.maxLength) {this.value = this.value.slice(0, this.maxLength); this.nextElementSibling.focus();}"
+                    oninput="javascript: if (this.value.length >= this.maxLength) {this.value = this.value.slice(0, this.maxLength); focusNextElement();}"
                     required>
                 {% else %}
                 <button type="number" class="btn_ gray row-item center-logo" style="visibility: hidden;">-</button>
@@ -90,7 +94,9 @@
             {% endfor %}
 
             <br>
-            <div class="numbers-row"><input type="submit" class="btn_ blue submit" value="Submit"></div>
+            <div class="container d-flex align-items-center justify-content-center flex-column" style="padding: 0px; margin: 0px;">
+                <div class="numbers-row"><input type="submit" class="btn_ blue user-input-submit" value="Submit"></div>
+            </div>
         </form>
         {% endif %}
     </div>
@@ -154,11 +160,9 @@
 
     <br><br>
 
-    {% if game.user.username == 'Tutorial' %}
-    <strong><a id="newgame" href="{% url 'play:play_view' %}" autofocus>Start a new game</a></strong>
-    {% else %}
-    <strong><a id="newgame" href="{% url 'play:play_view' %}" autofocus>Play again?</a></strong>
-    {% endif %}
+    <div class="container d-flex align-items-center justify-content-center flex-column m-0 p-0">
+        <a id="newgame" href="{% url 'play:play_view' %}"><h2 class="btn_ blue">Play again?</h2></a>
+    </div>
 
     <script>
         document.getElementById("newgame").focus()
@@ -170,21 +174,45 @@
     {% if not game.game_completed and request.user == game.user %}
     <form id="forfeit"
         hx-post="{% url 'play:game_forfeit_view' game.game_mode game.pk %}"
-        hx-trigger="click"
+        hx-confirm="Are you sure you wish to forfeit your game?"
+        hx-trigger="submit"
         hx-target="#parent-div">
         {% csrf_token %}
-        <div class="numbers-row"><input type="submit" class="btn_ red" value="Forfeit Game"></div>
+        <div class="container d-flex align-items-center justify-content-center flex-column m-0 p-0">
+            <input type="submit" class="btn_ red m-0" value="Forfeit Game">
+        </div>
     </form>
     {% endif %}
     
 </div>
 
 <script>
+
+    let focus_point = document.querySelectorAll('.user-input')
+    focus_point[0].focus()
+
+    function focusNextElement() {
+        let elements1 = Array.prototype.slice.call(document.querySelectorAll('.user-input')).filter(el => !el.disabled && el.offsetParent !== null);
+        let elements2 = Array.prototype.slice.call(document.querySelectorAll('.user-input-vertical')).filter(el => !el.disabled && el.offsetParent !== null);
+        let elements3 = Array.prototype.slice.call(document.querySelectorAll('.user-input-submit')).filter(el => !el.disabled && el.offsetParent !== null);
+
+        let concatenatedArray = elements1.concat(elements2);
+        let elements = concatenatedArray.concat(elements3);
+
+        const activeElement = document.activeElement;
+        const currentIndex = elements.indexOf(activeElement);
+        const nextIndex = (currentIndex + 1) % elements.length;
+
+        elements[nextIndex].focus();
+    }
+</script>
+
+<script>
     document.addEventListener('keydown', function(event) {
     // Get the currently focused element
     const focusedElement = document.activeElement;
     // List of focusable elements
-    const focusableElements = Array.from(document.querySelectorAll('input, button, [href], select, textarea, [tabindex]:not([tabindex="-1"])'));
+    const focusableElements = Array.from(document.querySelectorAll('input, button'));
     const index = focusableElements.indexOf(focusedElement);
 
     let nextElement = null;
@@ -228,5 +256,6 @@
     }
     });
 </script>
+
 
 {% endblock %}

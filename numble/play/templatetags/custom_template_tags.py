@@ -112,7 +112,11 @@ def get_user_stats(user):
     if streak == None:
         streak = 0
     else:
-        streak = streak.streak
+        now = timezone.now().date()
+        if now > streak.date:
+            streak = 0 
+        else:
+            streak = streak.streak
 
     number_of_daily_games = Game.objects.filter(user=user, game_mode='daily', game_completed=True).count()
     return {

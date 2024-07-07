@@ -2,48 +2,27 @@
 {% load custom_template_tags %}
 
 <div id="parent-div">
-    <script>
-        document.getElementById('input_cell0').value = '';
-        document.getElementById('input_cell1').value = '';
-        document.getElementById('input_cell2').value = '';
-        document.getElementById('input_cell3').value = '';
-        try {
-            document.getElementById('input_cell2_0').value = '';
-        } catch (error) {}
-        try {
-            document.getElementById('input_cell2_1').value = '';
-        } catch (error) {}
-        try {
-            document.getElementById('input_cell2_2').value = '';
-        } catch (error) {}
-        try {
-            document.getElementById('input_cell2_3').value = '';
-        } catch (error) {}
-        document.getElementById("input_cell0").focus()
-    </script>
-
-
     {% for game_try in game_tries_range %}
     {% get_value_1d game_tries game_try as game_try_1 %}
     {% get_value_1d game_tries2 game_try as game_try_2 %}
-    <p class="border-top border-2 mt-4">Try #{% increment game_try %}:</p>
+    <p class="border-top border-2 mt-2">Try #{% increment game_try %}:</p>
     {% for i in game_mode_range %}
     <div class="numbers-row">
         {% if i == game.pivot %}
             {% for j in game_mode_range %}
                 {% if j == game.pivot %}
-                <button type="number" class="btn_ {% get_color_by_numbers game.number game.number2 game_try_1 j %} row-item center-logo">{% get_value_1d game_try_1 j %}</button>
+                <button type="number" id="try{% increment game_try %}__2_{{i}}" class="btn_ {% get_color_by_numbers game.number game.number2 game_try_1 j %} row-item center-logo">{% get_value_1d game_try_1 j %}</button>
                 {% else %}
-                <button type="number" class="btn_ {% get_color_by_number game.number game_try_1 j %} row-item center-logo">{% get_value_1d game_try_1 j %}</button>
+                <button type="number" id="try{% increment game_try %}__1_{{j}}" class="btn_ {% get_color_by_number game.number game_try_1 j %} row-item center-logo">{% get_value_1d game_try_1 j %}</button>
                 {% endif %}
             {% endfor %}
 
         {% else %}
             {% for j in game_mode_range %}
                 {% if j == game.pivot %}
-                <button type="number" class="btn_ {% get_color_by_number game.number2 game_try_2 i %} row-item center-logo">{% get_value_1d game_try_2 i %}</button>
+                <button type="number" id="try{% increment game_try %}__2_{{i}}" class="btn_ {% get_color_by_number game.number2 game_try_2 i %} row-item center-logo">{% get_value_1d game_try_2 i %}</button>
                 {% else %}
-                <button type="number" class="btn_ gray row-item center-logo" style="visibility: hidden;">-</button>
+                <button type="number" id="try{% increment game_try %}__1_{{j}}" class="btn_ gray row-item center-logo" style="visibility: hidden;">-</button>
                 {% endif %}
             {% endfor %}
         {% endif %}
@@ -51,6 +30,67 @@
     {% endfor %}
     {% endfor %}
 
+    {% if not game.game_completed %}
+    <div class="border-top border-2 mt-4">Please enter try #{% increment game.number_of_tries %}:</div>
+    {% endif %}
+
+    <script>
+        gray = document.getElementById('try{{game.number_of_tries}}__2_0').classList.contains('gray')
+        orange = document.getElementById('try{{game.number_of_tries}}__2_0').classList.contains('orange')
+        if(gray || orange){
+            document.getElementById('input_cell2_0').value = '';
+        }
+
+        gray = document.getElementById('try{{game.number_of_tries}}__2_1').classList.contains('gray')
+        orange = document.getElementById('try{{game.number_of_tries}}__2_1').classList.contains('orange')
+        if(gray || orange){
+            document.getElementById('input_cell2_1').value = '';
+        }
+
+        gray = document.getElementById('try{{game.number_of_tries}}__2_2').classList.contains('gray')
+        orange = document.getElementById('try{{game.number_of_tries}}__2_2').classList.contains('orange')
+        if(gray || orange){
+            document.getElementById('input_cell2_2').value = '';
+        }
+
+        gray = document.getElementById('try{{game.number_of_tries}}__2_3').classList.contains('gray')
+        orange = document.getElementById('try{{game.number_of_tries}}__2_3').classList.contains('orange')
+        if(gray || orange){
+            document.getElementById('input_cell2_3').value = '';
+        }
+
+        try{
+            gray = document.getElementById('try{{game.number_of_tries}}__1_0').classList.contains('gray')
+            orange = document.getElementById('try{{game.number_of_tries}}__1_0').classList.contains('orange')
+            if(gray || orange){
+                document.getElementById('input_cell0').value = '';
+            }
+        } catch (error) {}
+
+        try {
+            gray = document.getElementById('try{{game.number_of_tries}}__1_1').classList.contains('gray')
+            orange = document.getElementById('try{{game.number_of_tries}}__1_1').classList.contains('orange')
+            if(gray || orange){
+                document.getElementById('input_cell1').value = '';
+            }
+        } catch (error) {}
+
+        try{
+            gray = document.getElementById('try{{game.number_of_tries}}__1_2').classList.contains('gray')
+            orange = document.getElementById('try{{game.number_of_tries}}__1_2').classList.contains('orange')
+            if(gray || orange){
+                document.getElementById('input_cell2').value = '';
+            }
+        } catch (error) {}
+
+        try{
+            gray = document.getElementById('try{{game.number_of_tries}}__1_3').classList.contains('gray')
+            orange = document.getElementById('try{{game.number_of_tries}}__1_3').classList.contains('orange')
+            if(gray || orange){
+                document.getElementById('input_cell3').value = '';
+            }
+        } catch (error) {}
+    </script>
 
     {% if game.game_completed %}
     <br>
@@ -148,7 +188,10 @@
 
     <br><br>
 
-    <strong><a id="newgame" href="{% url 'play:play_view' %}" autofocus>Play again?</a></strong>
+    <div class="container d-flex align-items-center justify-content-center flex-column m-0 p-0">
+        <a id="newgame" href="{% url 'play:play_view' %}"><h2 class="btn_ blue">Play again?</h2></a>
+    </div>
+
     <script>
         document.getElementById("newgame").focus()
     </script>

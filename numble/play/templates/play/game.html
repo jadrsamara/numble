@@ -37,7 +37,8 @@
         <li><span style="color: #2ecc71; font-weight: bold;">Green</span>: correct and in the correct
             spot.</li>
     </ul>
-    <p>Note: there is no number repetition.</p>
+    <p>Note: zero is included making your choices: 0-9.</p>
+    <p>*Note: there is no number repetition.</p>
 
 
     <div id="parent-div">
@@ -65,7 +66,9 @@
                 {% endfor %}
             </div>
             <br>
-            <div class="numbers-row"><input type="submit" class="btn_ blue submit" value="Submit"></div>
+            <div class="container d-flex align-items-center justify-content-center flex-column m-0 p-0">
+                <div class="numbers-row"><input type="submit" class="btn_ blue" value="Submit"></div>
+            </div>
         </form>
         {% endif %}
     </div>
@@ -129,11 +132,9 @@
 
     <br><br>
 
-    {% if game.user.username == 'Tutorial' %}
-    <strong><a id="newgame" href="{% url 'play:play_view' %}" autofocus>Start a new game</a></strong>
-    {% else %}
-    <strong><a id="newgame" href="{% url 'play:play_view' %}" autofocus>Play again?</a></strong>
-    {% endif %}
+    <div class="container d-flex align-items-center justify-content-center flex-column m-0 p-0">
+        <a id="newgame" href="{% url 'play:play_view' %}"><h2 class="btn_ blue">Play again?</h2></a>
+    </div>
 
     <script>
         document.getElementById("newgame").focus()
@@ -145,10 +146,13 @@
     {% if not game.game_completed and request.user == game.user %}
     <form id="forfeit"
         hx-post="{% url 'play:game_forfeit_view' game.game_mode game.pk %}"
-        hx-trigger="click"
+        hx-confirm="Are you sure you wish to forfeit your game?"
+        hx-trigger="submit"
         hx-target="#parent-div">
         {% csrf_token %}
-        <div class="numbers-row"><input type="submit" class="btn_ red" value="Forfeit Game"></div>
+        <div class="container d-flex align-items-center justify-content-center flex-column m-0 p-0">
+            <input type="submit" class="btn_ red m-0" value="Forfeit Game">
+        </div>
     </form>
     {% endif %}
     

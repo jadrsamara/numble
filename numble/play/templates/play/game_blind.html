@@ -20,11 +20,12 @@
         <li><span style="color: #2ecc71; font-weight: bold;">Correct</span>: a number is correct and in the correct
             spot.</li>
     </ul>
-    <p>Note: there is no number repetition.</p>
+    <p>Note: zero is included making your choices: 0-9.</p>
+    <p>*Note: there is no number repetition.</p>
 
     <div id="parent-div">
         {% for i in game_tries_range %}
-        <div class="border-top border-2 mt-2">Try #{% increment i %}:</div>
+        <!-- <div class="border-top border-2 mt-2">Try #{% increment i %}:</div> -->
         <div class="numbers-row">
             {% for j in game_mode_range %}
             {% get_value_1d game_last_try j as game_last_try_digit %}
@@ -57,11 +58,13 @@
             </b>
         </div>
         {% endfor %}
+        {% if can_current_request_user_play %}
+        <div class="border-top border-2 mt-2">Please enter try #{% increment game.number_of_tries %}:</div>
+        {% endif %}
     </div>
 
     <div id="user-input">
         {% if can_current_request_user_play %}
-        <p class="border-top border-2 mt-2">Please enter a {{ game_mode_len }}-digit guess:</p>
         <form hx-post="{% url 'play:game_submit_view' game_mode=game.game_mode game_id=game.pk %}"
         hx-trigger="submit"
         hx-target="#parent-div">
@@ -79,11 +82,9 @@
                 </b>
             </div>
             <br>
-            <div class="numbers-row"><input type="submit" class="btn_ blue submit" value="Submit"></div>
-            <div class="vertical-line" style="visibility: hidden;"></div>
-            <b class="try-result-text" style="visibility: hidden;">
-                <span>{{ game_mode_len }} wrong</span>
-            </b>
+            <div class="container d-flex align-items-center justify-content-center flex-column" style="padding: 0px; margin: 0px;">
+                <div class="numbers-row"><input type="submit" class="btn_ blue" value="Submit"></div>
+            </div>
         </form>
         {% endif %}
     </div>
@@ -150,11 +151,10 @@
     </ul>
 
     <br><br>
-    {% if game.user.username == 'Tutorial' %}
-    <strong><a id="newgame" href="{% url 'play:play_view' %}" autofocus>Start a new game</a></strong>
-    {% else %}
-    <strong><a id="newgame" href="{% url 'play:play_view' %}" autofocus>Play again?</a></strong>
-    {% endif %}
+    
+    <div class="container d-flex align-items-center justify-content-center flex-column m-0 p-0">
+        <a id="newgame" href="{% url 'play:play_view' %}"><h2 class="btn_ blue">Play again?</h2></a>
+    </div>
 
     <script>
         document.getElementById("newgame").focus()
@@ -165,10 +165,13 @@
     {% if not game.game_completed and request.user == game.user %}
     <form id="forfeit"
         hx-post="{% url 'play:game_forfeit_view' game.game_mode game.pk %}"
-        hx-trigger="click"
+        hx-confirm="Are you sure you wish to forfeit your game?"
+        hx-trigger="submit"
         hx-target="#parent-div">
         {% csrf_token %}
-        <div class="numbers-row"><input type="submit" class="btn_ red" value="Forfeit Game"></div>
+        <div class="container d-flex align-items-center justify-content-center flex-column m-0 p-0">
+            <input type="submit" class="btn_ red m-0" value="Forfeit Game">
+        </div>
     </form>
     {% endif %}
     

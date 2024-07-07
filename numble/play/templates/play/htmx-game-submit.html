@@ -2,27 +2,68 @@
 {% load custom_template_tags %}
 
 <div id="parent-div">
-    <script>
-        document.getElementById('input_cell0').value = '';
-        document.getElementById('input_cell1').value = '';
-        document.getElementById('input_cell2').value = '';
-        document.getElementById('input_cell3').value = '';
-        try {
-            document.getElementById('input_cell4').value = '';
-        } catch (error) {}
-        try {
-            document.getElementById('input_cell5').value = '';
-        } catch (error) {}
-        document.getElementById("input_cell0").focus()
-    </script>
-
     {% for i in game_tries_range %}
     <div class="numbers-row">
         {% for j in game_mode_range %}
-        <button type="number" class="btn_ {% get_color game i j %} row-item center-logo">{% get_value_2d game_tries i j %}</button>
+        <button type="number" id="try{% increment i %}_{{j}}" class="btn_ {% get_color game i j %} row-item center-logo">{% get_value_2d game_tries i j %}</button>
         {% endfor %}
     </div>
     {% endfor %}
+
+    <script>
+        gray = document.getElementById('try{{game.number_of_tries}}_0').classList.contains('gray')
+        orange = document.getElementById('try{{game.number_of_tries}}_0').classList.contains('orange')
+        if(gray || orange){
+            document.getElementById('input_cell0').value = '';
+        }
+
+        gray = document.getElementById('try{{game.number_of_tries}}_1').classList.contains('gray')
+        orange = document.getElementById('try{{game.number_of_tries}}_1').classList.contains('orange')
+        if(gray || orange){
+            document.getElementById('input_cell1').value = '';
+        }
+
+        gray = document.getElementById('try{{game.number_of_tries}}_2').classList.contains('gray')
+        orange = document.getElementById('try{{game.number_of_tries}}_2').classList.contains('orange')
+        if(gray || orange){
+            document.getElementById('input_cell2').value = '';
+        }
+
+        gray = document.getElementById('try{{game.number_of_tries}}_3').classList.contains('gray')
+        orange = document.getElementById('try{{game.number_of_tries}}_3').classList.contains('orange')
+        if(gray || orange){
+            document.getElementById('input_cell3').value = '';
+        }
+
+        try{
+            gray = document.getElementById('try{{game.number_of_tries}}_4').classList.contains('gray')
+            orange = document.getElementById('try{{game.number_of_tries}}_4').classList.contains('orange')
+            if(gray || orange){
+                document.getElementById('input_cell4').value = '';
+            }
+        } catch (error) {}
+
+        try {
+            gray = document.getElementById('try{{game.number_of_tries}}_5').classList.contains('gray')
+            orange = document.getElementById('try{{game.number_of_tries}}_5').classList.contains('orange')
+            if(gray || orange){
+                document.getElementById('input_cell5').value = '';
+            }
+        } catch (error) {}
+
+        // document.getElementById('input_cell0').value = '';
+        // document.getElementById('input_cell1').value = '';
+        // document.getElementById('input_cell2').value = '';
+        // document.getElementById('input_cell3').value = '';
+        // try {
+        //     document.getElementById('input_cell4').value = '';
+        // } catch (error) {}
+        // try {
+        //     document.getElementById('input_cell5').value = '';
+        // } catch (error) {}
+
+        document.getElementById("input_cell0").focus()
+    </script>
 
     {% if game.game_completed %}
     <br>
@@ -120,7 +161,10 @@
 
     <br><br>
 
-    <strong><a id="newgame" href="{% url 'play:play_view' %}" autofocus>Play again?</a></strong>
+    <div class="container d-flex align-items-center justify-content-center flex-column m-0 p-0">
+        <a id="newgame" href="{% url 'play:play_view' %}"><h2 class="btn_ blue">Play again?</h2></a>
+    </div>
+    
     <script>
         document.getElementById("newgame").focus()
     </script>
