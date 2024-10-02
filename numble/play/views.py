@@ -54,6 +54,10 @@ def about_view(request):
     return HttpResponse("made by Jad Samara\ncontact@numble.one\n")
 
 
+def health_view(request):
+    return HttpResponse("success")
+
+
 def switch_theme_view(request):
 
     page = reverse(base_reverse)

@@ -35,61 +35,84 @@
     {% endif %}
 
     <script>
-        gray = document.getElementById('try{{game.number_of_tries}}__2_0').classList.contains('gray')
-        orange = document.getElementById('try{{game.number_of_tries}}__2_0').classList.contains('orange')
-        if(gray || orange){
-            document.getElementById('input_cell2_0').value = '';
-        }
-
-        gray = document.getElementById('try{{game.number_of_tries}}__2_1').classList.contains('gray')
-        orange = document.getElementById('try{{game.number_of_tries}}__2_1').classList.contains('orange')
-        if(gray || orange){
-            document.getElementById('input_cell2_1').value = '';
-        }
-
-        gray = document.getElementById('try{{game.number_of_tries}}__2_2').classList.contains('gray')
-        orange = document.getElementById('try{{game.number_of_tries}}__2_2').classList.contains('orange')
-        if(gray || orange){
-            document.getElementById('input_cell2_2').value = '';
-        }
-
-        gray = document.getElementById('try{{game.number_of_tries}}__2_3').classList.contains('gray')
-        orange = document.getElementById('try{{game.number_of_tries}}__2_3').classList.contains('orange')
-        if(gray || orange){
-            document.getElementById('input_cell2_3').value = '';
-        }
-
-        try{
-            gray = document.getElementById('try{{game.number_of_tries}}__1_0').classList.contains('gray')
-            orange = document.getElementById('try{{game.number_of_tries}}__1_0').classList.contains('orange')
-            if(gray || orange){
-                document.getElementById('input_cell0').value = '';
-            }
-        } catch (error) {}
-
+    
+        document.getElementById('input_cell0').value = '';
+        document.getElementById('input_cell1').value = '';
+        document.getElementById('input_cell2').value = '';
+        document.getElementById('input_cell3').value = '';
         try {
-            gray = document.getElementById('try{{game.number_of_tries}}__1_1').classList.contains('gray')
-            orange = document.getElementById('try{{game.number_of_tries}}__1_1').classList.contains('orange')
-            if(gray || orange){
-                document.getElementById('input_cell1').value = '';
-            }
+            document.getElementById('input_cell2_0').value = '';
+        } catch (error) {}
+        try {
+            document.getElementById('input_cell2_1').value = '';
+        } catch (error) {}
+        try {
+            document.getElementById('input_cell2_2').value = '';
+        } catch (error) {}
+        try {
+            document.getElementById('input_cell2_3').value = '';
         } catch (error) {}
 
-        try{
-            gray = document.getElementById('try{{game.number_of_tries}}__1_2').classList.contains('gray')
-            orange = document.getElementById('try{{game.number_of_tries}}__1_2').classList.contains('orange')
-            if(gray || orange){
-                document.getElementById('input_cell2').value = '';
-            }
-        } catch (error) {}
+        let focus_point = document.querySelectorAll('.user-input')
+        focus_point[0].focus()
 
-        try{
-            gray = document.getElementById('try{{game.number_of_tries}}__1_3').classList.contains('gray')
-            orange = document.getElementById('try{{game.number_of_tries}}__1_3').classList.contains('orange')
-            if(gray || orange){
-                document.getElementById('input_cell3').value = '';
-            }
-        } catch (error) {}
+        // document.getElementById("input_cell0").focus()
+    
+        // gray = document.getElementById('try{{game.number_of_tries}}__2_0').classList.contains('gray')
+        // orange = document.getElementById('try{{game.number_of_tries}}__2_0').classList.contains('orange')
+        // if(gray || orange){
+        //     document.getElementById('input_cell2_0').value = '';
+        // }
+
+        // gray = document.getElementById('try{{game.number_of_tries}}__2_1').classList.contains('gray')
+        // orange = document.getElementById('try{{game.number_of_tries}}__2_1').classList.contains('orange')
+        // if(gray || orange){
+        //     document.getElementById('input_cell2_1').value = '';
+        // }
+
+        // gray = document.getElementById('try{{game.number_of_tries}}__2_2').classList.contains('gray')
+        // orange = document.getElementById('try{{game.number_of_tries}}__2_2').classList.contains('orange')
+        // if(gray || orange){
+        //     document.getElementById('input_cell2_2').value = '';
+        // }
+
+        // gray = document.getElementById('try{{game.number_of_tries}}__2_3').classList.contains('gray')
+        // orange = document.getElementById('try{{game.number_of_tries}}__2_3').classList.contains('orange')
+        // if(gray || orange){
+        //     document.getElementById('input_cell2_3').value = '';
+        // }
+
+        // try{
+        //     gray = document.getElementById('try{{game.number_of_tries}}__1_0').classList.contains('gray')
+        //     orange = document.getElementById('try{{game.number_of_tries}}__1_0').classList.contains('orange')
+        //     if(gray || orange){
+        //         document.getElementById('input_cell0').value = '';
+        //     }
+        // } catch (error) {}
+
+        // try {
+        //     gray = document.getElementById('try{{game.number_of_tries}}__1_1').classList.contains('gray')
+        //     orange = document.getElementById('try{{game.number_of_tries}}__1_1').classList.contains('orange')
+        //     if(gray || orange){
+        //         document.getElementById('input_cell1').value = '';
+        //     }
+        // } catch (error) {}
+
+        // try{
+        //     gray = document.getElementById('try{{game.number_of_tries}}__1_2').classList.contains('gray')
+        //     orange = document.getElementById('try{{game.number_of_tries}}__1_2').classList.contains('orange')
+        //     if(gray || orange){
+        //         document.getElementById('input_cell2').value = '';
+        //     }
+        // } catch (error) {}
+
+        // try{
+        //     gray = document.getElementById('try{{game.number_of_tries}}__1_3').classList.contains('gray')
+        //     orange = document.getElementById('try{{game.number_of_tries}}__1_3').classList.contains('orange')
+        //     if(gray || orange){
+        //         document.getElementById('input_cell3').value = '';
+        //     }
+        // } catch (error) {}
     </script>
 
     {% if game.game_completed %}
