@@ -14,9 +14,9 @@
 
     gtag('config', 'G-FQNYV1X3S8');
     </script>
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=0.0.1">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=0.0.1">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=0.0.1">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}?v=0.0.1">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}?v=0.0.1">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}?v=0.0.1">
     <link rel="manifest" href="/site.webmanifest?v=0.0.1">
     <link rel="mask-icon" href="/safari-pinned-tab.svg?v=0.0.1" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#2d89ef">
@@ -34,7 +34,7 @@
     <meta property="og:title" content="Numble.One - Can you guess the Number?" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://numble.one" />
-    <meta property="og:image:url" content="https://numble.one/static/play/images/thumb.png?v=0.0.1" />
+    <meta property="og:image:url" content="{% static 'play/images/thumb.png' %}?v=0.0.1" />
     <meta property="og:description" content="Numble.One (نمبل) is a number guessing game like Wordle, offering normal play with visual hints, blind play, and daily challenges. Test your mind with visual cues and addictive gameplay!" />
     <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:og="http://ogp.me/ns#"
