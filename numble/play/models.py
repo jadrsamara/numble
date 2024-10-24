@@ -3,9 +3,12 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from secrets import token_urlsafe
+import newrelic.agent
 
 
 class GameManager(models.Manager):
+
+    @newrelic.agent.function_trace()
     def create_game(self, user, game_mode, number, expire_duration):
         game = self.create(
             user = user,
@@ -18,6 +21,7 @@ class GameManager(models.Manager):
         )
         return game
     
+    @newrelic.agent.function_trace()
     def create_2d_game(self, user, game_mode, number, number2, pivot, expire_duration):
         game = self.create(
             user = user,
@@ -68,8 +72,20 @@ class Game(models.Model):
 
     objects = GameManager()
 
+    @newrelic.agent.function_trace()
+    def save(self, *args, **kwargs):
+        # Trace the save method (INSERT/UPDATE in the DB)
+        super().save(*args, **kwargs)
+
+    @newrelic.agent.function_trace()
+    def delete(self, *args, **kwargs):
+        # Trace the delete method (DELETE in the DB)
+        super().delete(*args, **kwargs)
+
 
 class LeaderboardManager(models.Manager):
+
+    @newrelic.agent.function_trace()
     def create_leaderboard_item(self, game, user, game_mode, rank):
         leaderboard_item = self.create(
             user = user,
@@ -106,8 +122,20 @@ class Leaderboard(models.Model):
 
     objects = LeaderboardManager()
 
+    @newrelic.agent.function_trace()
+    def save(self, *args, **kwargs):
+        # Trace the save method (INSERT/UPDATE in the DB)
+        super().save(*args, **kwargs)
+
+    @newrelic.agent.function_trace()
+    def delete(self, *args, **kwargs):
+        # Trace the delete method (DELETE in the DB)
+        super().delete(*args, **kwargs)
+
 
 class StreakManager(models.Manager):
+
+    @newrelic.agent.function_trace()
     def create_streak(self, user):
         streak = self.create(
             user = user,
@@ -127,8 +155,20 @@ class Streak(models.Model):
 
     objects = StreakManager()
 
+    @newrelic.agent.function_trace()
+    def save(self, *args, **kwargs):
+        # Trace the save method (INSERT/UPDATE in the DB)
+        super().save(*args, **kwargs)
+
+    @newrelic.agent.function_trace()
+    def delete(self, *args, **kwargs):
+        # Trace the delete method (DELETE in the DB)
+        super().delete(*args, **kwargs)
+
 
 class ResetPasswordManager(models.Manager):
+
+    @newrelic.agent.function_trace()
     def create_reset_password(self, user):
         reset_password = self.create(
             user = user,
@@ -151,3 +191,13 @@ class ResetPassword(models.Model):
     token = models.CharField(max_length=100)
 
     objects = ResetPasswordManager()
+
+    @newrelic.agent.function_trace()
+    def save(self, *args, **kwargs):
+        # Trace the save method (INSERT/UPDATE in the DB)
+        super().save(*args, **kwargs)
+
+    @newrelic.agent.function_trace()
+    def delete(self, *args, **kwargs):
+        # Trace the delete method (DELETE in the DB)
+        super().delete(*args, **kwargs)

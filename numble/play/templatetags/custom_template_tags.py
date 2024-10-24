@@ -1,5 +1,6 @@
 from django import template
 from django.utils import timezone
+import newrelic.agent
 
 from .. models import Game, Streak
 
@@ -7,6 +8,7 @@ register = template.Library()
 
 
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_value_2d(l, i, j):
     try:
         return l[i][j]
@@ -15,6 +17,7 @@ def get_value_2d(l, i, j):
     
 
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_blind(game, i):
     try:
         correct = 0
@@ -36,6 +39,7 @@ def get_blind(game, i):
     
 
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_color(game, i, j):
     try:
         i += 1
@@ -49,6 +53,7 @@ def get_color(game, i, j):
     
 
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_color_by_number(number, try_number, j):
     try:
         if number[j] == try_number[j]:
@@ -61,6 +66,7 @@ def get_color_by_number(number, try_number, j):
     
 
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_color_by_numbers(number, number2, try_number, j):
     try:
         if number[j] == try_number[j] or number2[j] == try_number[j]:
@@ -73,6 +79,7 @@ def get_color_by_numbers(number, number2, try_number, j):
     
     
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_2d_color(game, i, j):
     try:
         i += 1
@@ -86,6 +93,7 @@ def get_2d_color(game, i, j):
     
 
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_value_1d(l, i):
     try:
         return l[i]
@@ -94,11 +102,13 @@ def get_value_1d(l, i):
     
     
 @register.simple_tag
+@newrelic.agent.function_trace()
 def increment(i):
     return i+1
     
 
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_theme(request):
     try:
         return request.session['dark_mode']
@@ -107,6 +117,7 @@ def get_theme(request):
     
 
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_user_stats(user):
     streak = Streak.objects.filter(user=user).first()
     if streak == None:
@@ -126,6 +137,7 @@ def get_user_stats(user):
 
 
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_user_streaks(games, game_mode):
 
     users_dict = dict()
@@ -159,15 +171,18 @@ def get_user_streaks(games, game_mode):
 
 
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_user_streak(user, user_streaks):
     return user_streaks[0][user.pk]
 
 
 @register.simple_tag
+@newrelic.agent.function_trace()
 def get_user_wl_ratio(user, user_streaks):
     return user_streaks[1][user.pk]
 
 
+@newrelic.agent.function_trace()
 def pretty_time_delta(seconds):
     seconds = int(seconds)
     days, seconds = divmod(seconds, 86400)
@@ -184,5 +199,6 @@ def pretty_time_delta(seconds):
 
 
 @register.filter
+@newrelic.agent.function_trace()
 def convert_to_readable_time(time):    
     return pretty_time_delta(time.total_seconds())

@@ -92,13 +92,26 @@ WSGI_APPLICATION = "numble.wsgi.application"
 # }
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.oracle",
-        "NAME": os.environ['DB_NAME'],
-        "USER": os.environ['DB_USER'],
-        "PASSWORD": os.environ['DB_PASSWORD'],
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',  # Use PostgreSQL engine
+        'NAME': os.environ.get('POSTGRES_DATABASE'),  # Database name
+        'USER': os.environ.get('POSTGRES_USER'),  # PostgreSQL username
+        'PASSWORD': os.environ.get('POSTGRES_PASS'),  # PostgreSQL password
+        'HOST': os.environ.get('POSTGRES_HOST'),  # Database host
+        'PORT': os.environ.get('POSTGRES_PORT'),  # Default PostgreSQL port
+        'OPTIONS': {
+            'sslmode': 'require',  # Enable SSL connection (if necessary)
+        }
     }
 }
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.oracle",
+#         "NAME": os.environ['DB_NAME'],
+#         "USER": os.environ['DB_USER'],
+#         "PASSWORD": os.environ['DB_PASSWORD'],
+#     }
+# }
 
 
 # Password validation

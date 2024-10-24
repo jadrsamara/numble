@@ -15,6 +15,7 @@ import logging
 import re
 import requests
 import json
+import newrelic.agent
 
 from secrets import token_urlsafe
 
@@ -42,7 +43,7 @@ request_logger = logging.getLogger("django")
 
 # --- Home ---
 
-
+@newrelic.agent.function_trace()
 def index(request):
     return render(
         request,
@@ -50,14 +51,17 @@ def index(request):
     )
 
 
+@newrelic.agent.function_trace()
 def about_view(request):
     return HttpResponse("made by Jad Samara\ncontact@numble.one\n")
 
 
+@newrelic.agent.function_trace()
 def health_view(request):
     return HttpResponse("success")
 
 
+@newrelic.agent.function_trace()
 def switch_theme_view(request):
 
     page = reverse(base_reverse)
@@ -79,6 +83,7 @@ def switch_theme_view(request):
 # --- User Views ---
 
 
+@newrelic.agent.function_trace()
 def signup_view(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse(base_reverse))
@@ -89,6 +94,7 @@ def signup_view(request):
     )
 
  
+@newrelic.agent.function_trace()
 def is_valid_email(email):
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
     if(re.fullmatch(regex, email)):
@@ -97,6 +103,7 @@ def is_valid_email(email):
         return False
     
 
+@newrelic.agent.function_trace()
 def is_valid_username(username):
 
     if not len(username) >= 3:
@@ -110,10 +117,12 @@ def is_valid_username(username):
 
 
 @require_http_methods(["POST"])
+@newrelic.agent.function_trace()
 def signup_done_view(request):
 
     sign_up_template = 'play/regestration/signup.html'
 
+    @newrelic.agent.function_trace()
     def validate(request):
 
         if len(request.POST["email"]) > 50 or len(request.POST["username"]) > 20:
@@ -203,6 +212,7 @@ def signup_done_view(request):
         )
 
 
+@newrelic.agent.function_trace()
 def login_view(request):
     next_page = request.GET.get('next') if request.GET.get('next') is not None else reverse(base_reverse)
 
@@ -217,6 +227,7 @@ def login_view(request):
 
 
 @require_http_methods(["POST"])
+@newrelic.agent.function_trace()
 def login_done_view(request):
     next_page = request.GET.get('next') if request.GET.get('next') is not None else reverse(base_reverse)
     
@@ -245,6 +256,7 @@ def login_done_view(request):
     return HttpResponseRedirect(next_page)
 
 
+@newrelic.agent.function_trace()
 def logout_view(request):
     if request.user.is_authenticated:
         logout(request)
@@ -255,6 +267,7 @@ def logout_view(request):
 
 
 # @login_required(login_url='/login/')
+@newrelic.agent.function_trace()
 def play_view(request):
 
     template_name = "play/play.html"
@@ -265,6 +278,7 @@ def play_view(request):
     )
 
 
+@newrelic.agent.function_trace()
 def generate_numbers_by_seed(seed, number_of_digits):
     random_with_seed.seed(seed)
     numbers = list(range(10))
@@ -272,6 +286,7 @@ def generate_numbers_by_seed(seed, number_of_digits):
     return numbers[:number_of_digits]
 
 
+@newrelic.agent.function_trace()
 def get_a_new_game_number(game_mode, request):
     number_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
     if game_mode in ['easy', 'blind', '2d']:
@@ -291,6 +306,7 @@ def get_a_new_game_number(game_mode, request):
         return ''.join(str(num) for num in game_number)
     
 
+@newrelic.agent.function_trace()
 def get_2d_game_number2(number):
     number_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
     pivot_point_values = list(range(4))
@@ -304,6 +320,7 @@ def get_2d_game_number2(number):
     return ''.join(str(num) for num in number2) , pivot_point
 
 
+@newrelic.agent.function_trace()
 def get_user_from_request(request) -> User:
     if request.user.is_anonymous:
         try:
@@ -321,6 +338,7 @@ def get_user_from_request(request) -> User:
 
 
 # @login_required(login_url='/login/')
+@newrelic.agent.function_trace()
 def game_view(request, game_mode):
     """
     Creates a new game if user has no current games
@@ -391,6 +409,7 @@ def game_view(request, game_mode):
 
 
 # @login_required(login_url='/login/')
+@newrelic.agent.function_trace()
 def game_by_id_view(request, game_mode, game_id):
 
     game = Game.objects.filter(pk=game_id, game_mode=game_mode).first()
@@ -457,11 +476,13 @@ def game_by_id_view(request, game_mode, game_id):
     )
 
 
+@newrelic.agent.function_trace()
 def game_won_options(game: Game, user: User, game_mode: str, request):
     
     if user.username == 'Anonymous':
         return
 
+    @newrelic.agent.function_trace()
     def user_game_streak():
         streak = Streak.objects.filter(user=user).first()
 
@@ -568,6 +589,7 @@ def game_won_options(game: Game, user: User, game_mode: str, request):
 
 
 @require_http_methods(["POST"])
+@newrelic.agent.function_trace()
 def game_forfeit_view(request, game_mode, game_id):
     
     user = get_user_from_request(request)
@@ -596,6 +618,7 @@ def game_forfeit_view(request, game_mode, game_id):
     return htmx_game_submit(request, game)
 
 
+@newrelic.agent.function_trace()
 def htmx_game_submit(request, game):
 
     tries = []
@@ -641,6 +664,7 @@ def htmx_game_submit(request, game):
 
 
 @require_http_methods(["POST"])
+@newrelic.agent.function_trace()
 def game_submit_view(request, game_mode, game_id):
 
     user = get_user_from_request(request)
@@ -736,6 +760,7 @@ def game_submit_view(request, game_mode, game_id):
     return htmx_game_submit(request, game)
 
 
+@newrelic.agent.function_trace()
 def user_profile(request, username):
 
     profile_user = get_object_or_404(User, username=username)
@@ -788,6 +813,7 @@ def user_profile(request, username):
         },
     )
 
+@newrelic.agent.function_trace()
 def leaderboard_view(request):
 
     template_name = "play/leaderboard.html"
@@ -800,11 +826,16 @@ def leaderboard_view(request):
 
     request_game_mode = request.GET.get('game_mode')
 
-    if request_game_mode in Leaderboard_game_modes:
-        top_games = Leaderboard.objects.filter(game_mode=request_game_mode)
-    else:
-        top_games = Leaderboard.objects.filter(game_mode='easy')
-        request_game_mode = 'easy'
+    @newrelic.agent.function_trace()
+    def return_top_games(request_game_mode):
+        if request_game_mode in Leaderboard_game_modes:
+            top_games = Leaderboard.objects.filter(game_mode=request_game_mode)
+        else:
+            top_games = Leaderboard.objects.filter(game_mode='easy')
+            request_game_mode = 'easy'
+        return top_games, request_game_mode
+    
+    top_games, request_game_mode = return_top_games(request_game_mode)
 
     top_games = sorted(list(top_games), key=lambda x: x.rank, reverse=False)
 
@@ -824,6 +855,7 @@ def leaderboard_view(request):
     )
 
 
+@newrelic.agent.function_trace()
 def password_reset_view(request):
 
     if request.user.is_authenticated:
@@ -865,6 +897,7 @@ def password_reset_view(request):
     )
 
 
+@newrelic.agent.function_trace()
 def send_reset_password_email_if_eligible(request):
 
     if not 50 >= len(request.POST["email_or_username"]) >= 3:
@@ -892,6 +925,7 @@ def send_reset_password_email_if_eligible(request):
     return False
 
 
+@newrelic.agent.function_trace()
 def generate_new_token_and_send_reset_email(user, request):
 
     reset_password = ResetPassword.objects.filter(user=user).first()
@@ -919,6 +953,7 @@ def generate_new_token_and_send_reset_email(user, request):
     return send_reset_password_email(user.email, user.username, reset_password.token, request)
 
 
+@newrelic.agent.function_trace()
 def send_reset_password_email(email, username, token, request):
     api_key = os.environ['MJ_APIKEY_PUBLIC']
     api_secret = os.environ['MJ_APIKEY_PRIVATE']
@@ -994,6 +1029,7 @@ def send_reset_password_email(email, username, token, request):
         return False
     
 
+@newrelic.agent.function_trace()
 def password_reset_submit_view(request):
 
     token = request.GET.get("token", False)
@@ -1022,6 +1058,7 @@ def password_reset_submit_view(request):
 
 
 @require_http_methods(["POST"])
+@newrelic.agent.function_trace()
 def password_reset_done_view(request):
 
     token = request.GET.get("token", False)
