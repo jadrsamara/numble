@@ -193,10 +193,10 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
-        "file": {
-            "class": "logging.FileHandler",
-            "formatter": "simple",
-            "filename": BASE_DIR / "logging/",
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/django.log',  # Using the /tmp directory for logging
         },
         'new_relic': {
             'level': 'DEBUG',
@@ -208,7 +208,9 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["console", "new_relic"],
+            "handlers": ["console", "new_relic", "file"],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     },
 }
