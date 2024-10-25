@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="resetpassword",
             name="expire_date",
-            field=models.TimeField(
+            field=models.DateTimeField(
                 default=datetime.datetime(
                     2024, 6, 17, 11, 34, 29, 22606, tzinfo=datetime.timezone.utc
                 )
@@ -31,6 +31,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="resetpassword",
             name="date",
-            field=models.TimeField(),
+            field=models.DateTimeField(),
         ),
     ]
