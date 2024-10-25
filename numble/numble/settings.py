@@ -181,19 +181,26 @@ USE_TZ = True
 # ]
 
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-
-# The directory where collectstatic will collect static files for production
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'play/static')]  # Update to include your app's static directory
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Optionally, add additional static file directories
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'play/static'),
-]
+
+# # Build paths inside the project like this: BASE_DIR / 'subdir'.
+# BASE_DIR = Path(__file__).resolve().parent.parent
+
+# # Static files (CSS, JavaScript, Images)
+# STATIC_URL = '/static/'
+
+# # The directory where collectstatic will collect static files for production
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# # Optionally, add additional static file directories
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'play/static'),
+# ]
 
 
 # Default primary key field type

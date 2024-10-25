@@ -1,7 +1,7 @@
 {
   "builds": [
     {
-      "src": "vercel.py",
+      "src": "numble/wsgi.py",
       "use": "@vercel/python"
     }
   ],
@@ -9,10 +9,6 @@
     {
       "src": "/static/(.*)",
       "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/vercel.py"
     },
     {
       "src": "/favicon(.*).ico",
@@ -29,6 +25,10 @@
     {
       "src": "/(.*).webmanifest",
       "dest": "/static/$1.webmanifest"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "numble/wsgi.py"
     }
   ]
 }
