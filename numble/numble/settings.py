@@ -192,7 +192,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Optionally, add additional static file directories
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'play/static'),
+    os.path.join(BASE_DIR, 'static'),
 ]
 
 
