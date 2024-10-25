@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 from custom_log_handler import NewRelicLogHandler
-import oracledb
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -91,27 +91,49 @@ WSGI_APPLICATION = "numble.wsgi.application"
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',  # Use PostgreSQL engine
-        'NAME': os.environ.get('POSTGRES_DATABASE'),  # Database name
-        'USER': os.environ.get('POSTGRES_USER'),  # PostgreSQL username
-        'PASSWORD': os.environ.get('POSTGRES_PASS'),  # PostgreSQL password
-        'HOST': os.environ.get('POSTGRES_HOST'),  # Database host
-        'PORT': os.environ.get('POSTGRES_PORT'),  # Default PostgreSQL port
-        'OPTIONS': {
-            'sslmode': 'require',  # Enable SSL connection (if necessary)
-        }
-    }
-}
 # DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.oracle",
-#         "NAME": os.environ['DB_NAME'],
-#         "USER": os.environ['DB_USER'],
-#         "PASSWORD": os.environ['DB_PASSWORD'],
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',  # Use PostgreSQL engine
+#         'NAME': os.environ.get('POSTGRES_DATABASE'),  # Database name
+#         'USER': os.environ.get('POSTGRES_USER'),  # PostgreSQL username
+#         'PASSWORD': os.environ.get('POSTGRES_PASS'),  # PostgreSQL password
+#         'HOST': os.environ.get('POSTGRES_HOST'),  # Database host
+#         'PORT': os.environ.get('POSTGRES_PORT'),  # Default PostgreSQL port
+#         'OPTIONS': {
+#             'sslmode': 'require',  # Enable SSL connection (if necessary)
+#         }
 #     }
 # }
+
+
+def parse_database_url(url):
+
+    result = urlparse(url)
+
+    return {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': result.path[1:],  # Skip the leading '/'
+        'USER': result.username,
+        'PASSWORD': result.password,
+        'HOST': result.hostname,
+        'PORT': result.port,
+    }
+
+
+DATABASES = {
+    "default": {
+        parse_database_url(os.getenv('DATABASE_URL'))
+    }
+}
+
+# Configure the pooled connection timeout (e.g., 600 seconds for pooling)
+DATABASES['default']['CONN_MAX_AGE'] = 600
+
+# Set up the unpooled database connection (optional)
+unpooled_db_url = os.getenv('DATABASE_URL_UNPOOLED')
+if unpooled_db_url:
+    DATABASES['unpooled'] = parse_database_url(unpooled_db_url)
+    DATABASES['unpooled']['CONN_MAX_AGE'] = 0  # No pooling for the unpooled connection
 
 
 # Password validation
