@@ -3,15 +3,12 @@
     {
       "src": "vercel.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "build_files.sh",
+      "use": "@vercel/static"
     }
   ],
-  "hooks": {
-    "build": {
-      "commands": [
-        "python manage.py collectstatic --noinput"
-      ]
-    }
-  },
   "routes": [
     {
       "src": "/static/(.*)",
