@@ -121,9 +121,7 @@ def parse_database_url(url):
 
 
 DATABASES = {
-    "default": {
-        parse_database_url(os.getenv('DATABASE_URL'))
-    }
+    "default": parse_database_url(os.getenv('DATABASE_URL'))
 }
 
 # Configure the pooled connection timeout (e.g., 600 seconds for pooling)
