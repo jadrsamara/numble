@@ -13,6 +13,22 @@
     {
       "src": "/(.*)",
       "dest": "/vercel.py"
+    },
+    {
+      "src": "/favicon(.*).ico",
+      "dest": "/static/favicon$1.ico"
+    },
+    {
+      "src": "/(.*).png",
+      "dest": "/static/$1.png"
+    },
+    {
+      "src": "/(.*).xml",
+      "dest": "/static/$1.xml"
+    },
+    {
+      "src": "/(.*).webmanifest",
+      "dest": "/static/$1.webmanifest"
     }
   ]
 }
