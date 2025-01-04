@@ -111,7 +111,7 @@ def increment(i):
 @newrelic.agent.function_trace()
 def get_theme(request):
     try:
-        return request.session['dark_mode']
+        return request.COOKIES.get('dark_mode')  # Returns None if the cookie is not set
     except:
         return 'light'
     

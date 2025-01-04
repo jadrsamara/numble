@@ -115,25 +115,39 @@
             <span style="filter: grayscale(1);">📅 0</span><span class="user_stats_hidden_content"> dailies solved</span>
             {% endif %}
         </div>
-        <form class="text-muted select-theme-from" action="{% url 'play:switch_theme_view' %}" method="post">
-            {% csrf_token %}
-            <div class="col-12">
-                <select class="form-select" id="inlineFormSelectPref" onchange="this.form.submit()">
-                    {% get_theme request as theme %}
-                    {% if theme == 'light' %}
-                    <option disabled selected>Theme</option>
-                    <option name="theme" value="dark">Dark</option>
-                    {% else %}
-                    <option disabled selected>Theme</option>
-                    <option name="theme" value="light">Light</option>
-                    {% endif %}
-                </select>
+
+          <button class="theme-container" aria-label="Toggle color mode" title="Toggle color mode">
+            <div class="sun mode-{% get_theme request %}">
             </div>
-        </form>
+            <div class="moon mode-{% get_theme request %}">
+              <div class="star"></div>
+              <div class="star small"></div>
+            </div>
+            </button>
+        
     </footer>
 </body>
 
 <script>
+
+    const sun = document.querySelector('.sun')
+    const moon = document.querySelector('.moon')
+    const button = document.querySelector('.theme-container')
+
+    button.addEventListener('click', () => {
+        sun.classList.toggle('mode-light')
+        moon.classList.toggle('mode-dark')
+
+        if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
+            document.documentElement.setAttribute('data-bs-theme','light')
+            document.cookie = "dark_mode=light; path=/";
+        }
+        else {
+            document.documentElement.setAttribute('data-bs-theme','dark')
+            document.cookie = "dark_mode=dark; path=/";
+        }
+    })
+
     animateDisplay = function(target, animationClass, displayType, timeout) {
         var doneTimedDisplay = false,
         displaying = false;

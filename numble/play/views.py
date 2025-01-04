@@ -69,15 +69,37 @@ def switch_theme_view(request):
     if referer:
         page = referer.replace(request.META.get('HTTP_ORIGIN'), '')
 
-    if 'dark_mode' not in request.session:
-        request.session['dark_mode'] = 'dark'
-        return HttpResponseRedirect(page)
+    # if 'dark_mode' not in request.session:
+    #     request.session['dark_mode'] = 'dark'
+    #     return HttpResponseRedirect(page)
     
-    if request.session['dark_mode'] == 'light':
-        request.session['dark_mode'] = 'dark'
+    # if request.session['dark_mode'] == 'light':
+    #     request.session['dark_mode'] = 'dark'
+    # else:
+    #     request.session['dark_mode'] = 'light'
+
+    response = HttpResponseRedirect(page)
+
+    dark_mode = request.COOKIES.get('dark_mode')  # Returns None if the cookie is not set
+    if dark_mode:
+        if dark_mode == 'light':
+            mode = 'dark'
+        else:
+            mode = 'light'
+
+        response.set_cookie(
+            key='dark_mode',   # The name of the cookie
+            value=mode,      # The value of the cookie
+            httponly=True,     # Whether the cookie is accessible only by the server
+        )
     else:
-        request.session['dark_mode'] = 'light'
-    return HttpResponseRedirect(page)
+        response.set_cookie(
+            key='dark_mode',   # The name of the cookie
+            value='dark',      # The value of the cookie
+            # httponly=True,     # Whether the cookie is accessible only by the server
+        )
+
+    return response
 
 
 # --- User Views ---
