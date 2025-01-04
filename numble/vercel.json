@@ -34,16 +34,5 @@
       "src": "/(.*)",
       "dest": "/vercel.py"
     }
-  ],
-  "headers": [
-    {
-      "source": "/static/(.*)\\.(css|js|png|jpg|jpeg|gif|svg|woff|woff2|eot|ttf|otf)$",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    }
   ]
 }
