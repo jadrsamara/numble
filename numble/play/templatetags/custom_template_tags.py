@@ -113,7 +113,7 @@ def get_theme(request):
     try:
         mode = request.COOKIES.get('dark_mode')  # Returns None if the cookie is not set
         if mode == None:
-            return 'light
+            return 'light'
         else:
             return mode
     except:
