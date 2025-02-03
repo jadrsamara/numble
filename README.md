@@ -14,7 +14,6 @@ Currnet Status:
 ![Gunicorn](https://img.shields.io/badge/gunicorn-298729g?logo=gunicorn&logoColor=white)
 ![Nginx](https://img.shields.io/badge/nginx-009639?logo=nginx&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-0c9cc9?logo=docker&logoColor=white)
-![Oracle](https://img.shields.io/badge/Oracle-a10202?logo=oracle&logoColor=white)
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-bf6215?logo=Cloudflare&logoColor=white)
 ![New Relic](https://img.shields.io/badge/new_nelic-03301b?logo=new%20relic&logoColor=white)
 ![Mailjet](https://img.shields.io/badge/Mailjet-7c46e8?logo=minutemailer&logoColor=white)
